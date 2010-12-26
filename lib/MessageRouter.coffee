@@ -18,10 +18,6 @@ class MessageRouter
         # "Main" message handler, will match the action list
         client.addListener 'message', _.bind @onMessage, this
     
-        # Quick 'n dirty error handler
-        client.addListener 'error', (error) ->
-            console.log 'ERROR!', error
-    
     # Add a handler to the message router
     addHandler: (match, callback, scope) ->
         

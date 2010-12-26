@@ -8,8 +8,11 @@ RandomInteger = require '../lib/RandomInteger'
 class InsultBot extends MessageRouter
     
     # Constructor
-    constructor: (@client, @nick) ->
+    constructor: (@client) ->
         super @client
+        
+        # Get our nick out of the client's options
+        @nick = client.opt.nick
         
         # Add a message handler for getting petted
         replies = ['take your stinking paws of me!', 'go pet mirmo', 'your mom pets me better...']
