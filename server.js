@@ -1,51 +1,16 @@
+// Utilities
 var irc = require('irc');
 var sys = require('sys');
 var _ = require('underscore');
 
+// Message router
+var Router = require('./lib/MessageRouter');
+
 // Channel
-const channel = '#zflounge';
-// const channel = '#naneautest';
+// const channel = '#zflounge';
+const channel = '#naneautest';
 const nick = 'naneaubot';
 const server = 'irc.freenode.net';
-
-// *Very* basic IRC callback router for incoming messages
-var Router = function(client) {
-    
-    // Irc client
-    this.client = client;
-    
-    // Hash of action handlers, match => [function, function, ...]
-    this.actions = {};
-    
-    // "Main" message handler, will match the action list
-    client.addListener('message', _(this.onMessage).bind(this));
-    
-    // Quick 'n dirty error handler
-    client.addListener('error', function(error) {
-        console.log('ERROR!', error);
-    });
-};
-
-// Message handler
-Router.prototype.onMessage = function(from, to, message) {
-    _(this.actions).each(function(actions, match) {
-        // for every match
-        if (message.match(match)) {
-            _(actions).each(function(callback) {
-                callback(from, to, message);                
-            });
-        }
-    });
-};
-
-// Add a handler for a match, match can be string or regex
-Router.prototype.addHandler = function(match, callback) {
-    if (this.actions[match] == undefined) {
-        this.actions[match] = [];
-    }
-    
-    this.actions[match].push(callback);
-};
 
 // Create client
 var client = new irc.Client(server, nick, {
