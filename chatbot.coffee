@@ -12,14 +12,13 @@ irc = require 'irc'
 # Bot
 Bot = require './app/InsultBot'
 
-#channel = '#zflounge';
-channel = '#naneautest';
+channel = '#zflounge';
+# channel = '#naneautest';
 nick = 'naneaubot';
 server = 'irc.freenode.net';
 
 # Instantiate the IRC Client
 client = new irc.Client server, nick, channels: [channel]
 
-
-
+# Create the insulting bot
 bot = new Bot client, nick
