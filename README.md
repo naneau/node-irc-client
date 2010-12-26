@@ -1,0 +1,3 @@
+# Very simple and stupid Node.js IRC bot
+
+This is mainly an attempt to mess with coffeescript...
