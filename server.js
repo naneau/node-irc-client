@@ -17,7 +17,7 @@ var client = new irc.Client(server, nick, {
     channels: [channel]
 });
 
-// Set up the router
+// Set up the Message router
 var router = new Router(client);
 
 // Add a message handler for getting petted
