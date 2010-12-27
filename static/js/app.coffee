@@ -1,13 +1,57 @@
+# Application class
+class IRCApp
+    
+    # Constructor
+    constructor: (element) ->
+        
+        # Create socket connection
+        @socket = new io.Socket;
+        
+        # List of messages received
+        @messageList = new MessageList;
+        
+        # List of message (to be) sent
+        @inputList = new MessageList;
+        
+        # When a new message is added to the input list, send it to the server
+        @inputList.bind 'add', (message) =>
+            @socket.send message: message.toJSON()
+        
+        # Message handler
+        @socket.on 'message', (data) =>
+            if data['message']
+                @messageList.add new Message data['message']
+        
+        # Main view for the application
+        @appView = new AppView
+            el: element,
+            messageList: @messageList,
+            inputList: @inputList
+        
+        # Render
+        @appView.render()
+        
+        # Connect the socket
+        @socket.connect()
+        
+window.IRCApp = IRCApp
+
 # Main "chat list" view
-App = Backbone.View.extend
-    # events:
+AppView = Backbone.View.extend
+    
+    # Event hash
+    events:
+        'keydown     input':     'inputKey'
         
     # Initialize
     initialize: (options) ->
-        _.bindAll this, 'render', 'newMessage', 'renderMessage'
+        _.bindAll this, 'render', 'newMessage', 'renderMessage', 'inputKey'
         
+        # Get stuff out of the options
         @messageList = options.messageList
+        @inputList = options.inputList
         
+        # When a message is received, render it
         @messageList.bind 'add', @newMessage
         
         # Create template
@@ -27,10 +71,19 @@ App = Backbone.View.extend
         message.view or= new MessageView model: message
         message.view.render()
         
-        console.log message.view.el, @chatList
-        
         @chatList.append message.view.el
+    
+    # Input box key-up handler
+    inputKey: (e) ->
         
+        if e.keyCode is 13
+            e.preventDefault()
+            
+            # Create new message
+            @inputList.add new Message message: $(e.target).val()
+            
+            # Reset input box
+            $(e.target).val('')
     # Render
     render: () ->
         dom = $(@template())
@@ -44,16 +97,11 @@ App = Backbone.View.extend
         # Render each message in the list
         @messageList.each (message) ->
             renderMessage message
-            
-        
-
-# Export the App class as a global
-window.App = App;
 
 # View for a single message
 MessageView = Backbone.View.extend
+    # Ideally I'd have this come from 
     tagName: 'li'
-    
     className: 'message'
         
     # Initialize
@@ -65,7 +113,7 @@ MessageView = Backbone.View.extend
         
     # Render through the template
     render: () ->
-        $(@el).html @template @model.toJSON()
+        @el = $ @template @model.toJSON()
         
         return this
 

@@ -24,29 +24,16 @@
         
         $(document).ready(function() {
             
-            // Use mustache style templates... because EJS (used server side, does not have an escape block :x)
+            // Use mustache style templates... because EJS, used server side, does not have an escape block :x
             _.templateSettings = {
               interpolate : /\{\{(.+?)\}\}/g
             };
             
-            var socket = new io.Socket;
-            
-            var list = new MessageList;
-            
-            socket.on('message', function(data) {
-                if (data['message']) {
-                    list.add(new Message(data['message']));
-                }
-            });
-            
-            var app = new App({
-                el: $('#app'),
-                messageList: list
-            });
-            
-            app.render();
-            
-            socket.connect();
+            // App
+            var app = new IRCApp(
+                $('#app')
+            )
+
         })
     </script>
 </head>
@@ -65,8 +52,10 @@
     </script>
     
     <script type="text/template" id="message-template">
-        <span class="nick">{{from}}</span>
-        {{message}}
+        <li class="message">
+            <span class="nick">{{from}}</span>
+            {{message}}
+        </li>
     </script>
 </body>
 </html>
