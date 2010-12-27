@@ -10,12 +10,15 @@ class IRCApp
         # List of messages received
         @messageList = new MessageList;
         
-        # List of message (to be) sent
+        # List of messages (to be) sent
         @inputList = new MessageList;
         
-        # When a new message is added to the input list, send it to the server
+        # When a new message is added to the input list, send it to the server, but also show it as a message
         @inputList.bind 'add', (message) =>
             @socket.send message: message.toJSON()
+            
+            # We have to "clone" the message here, before adding it to our own message list
+            @messageList.add new Message message.toJSON()
         
         # Message handler
         @socket.on 'message', (data) =>
@@ -72,18 +75,33 @@ AppView = Backbone.View.extend
         message.view.render()
         
         @chatList.append message.view.el
+        @chatList.attr 'scrollTop', @chatList.attr 'scrollHeight'
     
     # Input box key-up handler
     inputKey: (e) ->
+        e.preventDefault() if e.keyCode is 13 
         
-        if e.keyCode is 13
-            e.preventDefault()
+        inputVal = $(e.target).val()
+        
+        if e.keyCode is 13 and inputVal.length > 0
             
             # Create new message
-            @inputList.add new Message message: $(e.target).val()
+            @inputList.add new Message 
+                message: inputVal, 
+                from: 'you'
             
             # Reset input box
             $(e.target).val('')
+    
+    # Resize elements
+    resize: () ->
+        @chatList.height $(window).height() - 120
+        
+        input = @$ 'input'
+        input.focus()
+        input.width @chatList.width() - 15
+        
+            
     # Render
     render: () ->
         dom = $(@template())
@@ -91,19 +109,18 @@ AppView = Backbone.View.extend
         # Set chat list up as temporary (non-included) dom, so we can include it as a chunk (only one re-draw)
         @chatList = dom.find 'ul'
         
-        # Include the rendered DOM in one go in our element
-        @el.append dom
-        
         # Render each message in the list
         @messageList.each (message) ->
             renderMessage message
-
+            
+        # Include the rendered DOM in one go in our element
+        @el.append dom
+        
+        @resize()
+    
 # View for a single message
 MessageView = Backbone.View.extend
-    # Ideally I'd have this come from 
-    tagName: 'li'
-    className: 'message'
-        
+
     # Initialize
     initialize: (options) ->
         _.bindAll this, 'render'
@@ -113,15 +130,14 @@ MessageView = Backbone.View.extend
         
     # Render through the template
     render: () ->
+        # In this case we replace the entire node, since it's not in the dom anyway
         @el = $ @template @model.toJSON()
         
         return this
 
 # A single Message
 Message = Backbone.Model.extend()
-window.Message = Message
 
 # Collection of Messages
 MessageList = Backbone.Collection.extend
     model: Message
-window.MessageList = MessageList

@@ -1,3 +1,4 @@
+/* @override http://10.0.1.8/css/style.css */
 /* @group Reset */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -58,8 +59,13 @@ body {
     font-family: Helvetica;
 }
 
+.irc {
+	padding: 20px;
+}
 ul.chat {
-    padding: 20px;
+    padding: 20px 0;
+
+    overflow-y: auto;
 }
 
 .message {
@@ -74,4 +80,17 @@ ul.chat {
     padding: 0 10px 0 0;
     font-weight:bold;
 
+}
+
+input#message {
+    width: 300px;
+    left: -1px;
+    height: 20px;
+    background-color: rgba(255,255,255, 0.4);
+    border: 1px solid rgba(255,255,255, 0.5);
+    -webkit-box-shadow: 2px 2px 2px rgba(0,0,0, 0.3);
+    border-radius: 3px;
+    padding: 5px;
+    color:#fff;
+    font-size: 1.2em;
 }

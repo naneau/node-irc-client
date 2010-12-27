@@ -7,9 +7,10 @@
       this.messageList = new MessageList;
       this.inputList = new MessageList;
       this.inputList.bind('add', __bind(function(message) {
-        return this.socket.send({
+        this.socket.send({
           message: message.toJSON()
         });
+        return this.messageList.add(new Message(message.toJSON()));
       }, this));
       this.socket.on('message', __bind(function(data) {
         if (data['message']) {
@@ -47,30 +48,42 @@
         model: message
       }));
       message.view.render();
-      return this.chatList.append(message.view.el);
+      this.chatList.append(message.view.el);
+      return this.chatList.attr('scrollTop', this.chatList.attr('scrollHeight'));
     },
     inputKey: function(e) {
+      var inputVal;
       if (e.keyCode === 13) {
         e.preventDefault();
+      }
+      inputVal = $(e.target).val();
+      if (e.keyCode === 13 && inputVal.length > 0) {
         this.inputList.add(new Message({
-          message: $(e.target).val()
+          message: inputVal,
+          from: 'you'
         }));
         return $(e.target).val('');
       }
+    },
+    resize: function() {
+      var input;
+      this.chatList.height($(window).height() - 120);
+      input = this.$('input');
+      input.focus();
+      return input.width(this.chatList.width() - 15);
     },
     render: function() {
       var dom;
       dom = $(this.template());
       this.chatList = dom.find('ul');
-      this.el.append(dom);
-      return this.messageList.each(function(message) {
+      this.messageList.each(function(message) {
         return renderMessage(message);
       });
+      this.el.append(dom);
+      return this.resize();
     }
   });
   MessageView = Backbone.View.extend({
-    tagName: 'li',
-    className: 'message',
     initialize: function(options) {
       _.bindAll(this, 'render');
       return this.template = _.template($('#message-template').html());
@@ -81,9 +94,7 @@
     }
   });
   Message = Backbone.Model.extend();
-  window.Message = Message;
   MessageList = Backbone.Collection.extend({
     model: Message
   });
-  window.MessageList = MessageList;
 }).call(this);

@@ -60,9 +60,16 @@ socket.on 'connection', (client) ->
         if data.message
             ircClient.say channel, data.message.message
 
-# Broadcast messages received from IRC
-ircClient.addListener 'message', (from, to, message) ->
+# Broadcast a received message
+sendMessage = (from, to, message) ->
     socket.broadcast message:
         from: from
         to: to, 
         message: message
+
+# Broadcast messages received from IRC
+ircClient.addListener 'message', sendMessage
+
+# backLog = []
+# ircClient.addListener 'message', (from, to, message) ->
+#     backLog
