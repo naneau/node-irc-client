@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    
+    <title>Naneau's IRC</title>
+    
+    <link rel="stylesheet" href="css/style.css" />
+    
+    <script src="js/lib/jquery.js"></script>
+    <script src="js/lib/underscore.js"></script>
+    <script src="js/lib/backbone.js"></script>
+    <script src="socket.io/socket.io.js"></script> 
+    
+    <script type="text/javascript" src="js/app.js"></script>
+    
+    <script type="text/javascript">
+        
+        var config = {
+            server: '10.0.1.8',
+            port: 8080
+        }
+            
+        
+        $(document).ready(function() {
+            
+            // Use mustache style templates... because EJS (used server side, does not have an escape block :x)
+            _.templateSettings = {
+              interpolate : /\{\{(.+?)\}\}/g
+            };
+            
+            var socket = new io.Socket;
+            
+            var list = new MessageList;
+            
+            socket.on('message', function(data) {
+                if (data['message']) {
+                    list.add(new Message(data['message']));
+                }
+            });
+            
+            var app = new App({
+                el: $('#app'),
+                messageList: list
+            });
+            
+            app.render();
+            
+            socket.connect();
+        })
+    </script>
+</head>
+<body>
+    <div id="app"></div>
+    <%- body %>
+    
+    <script type="text/template" id="app-template">
+        <section class="irc">
+            <ul class="chat"></ul>
+            
+            <form>
+                <input type="text" id="message" />
+            </form>
+        </section>
+    </script>
+    
+    <script type="text/template" id="message-template">
+        <span class="nick">{{from}}</span>
+        {{message}}
+    </script>
+</body>
+</html>
