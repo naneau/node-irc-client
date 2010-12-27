@@ -20,3 +20,5 @@ This application should run in a recent node.js environment, dependencies can be
     * Express
     * Socket.io
     * IRC
+    * Underscore
+    * Ejs

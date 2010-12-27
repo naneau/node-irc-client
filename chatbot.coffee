@@ -46,8 +46,11 @@ app.set 'view engine', 'ejs'
 app.get '/', (request, response) ->
     response.render 'index' 
 
-# Listen on port 80
-app.listen 8080
+# Listen on port that is given (or use default)
+port = process.argv[2] 
+port ?= 8080
+console.log port
+app.listen parseInt port, 10
 
 # Socket.io config
 socket = io.listen app
