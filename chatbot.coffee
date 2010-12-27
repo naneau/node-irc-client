@@ -47,7 +47,7 @@ app.get '/', (request, response) ->
     response.render 'index' 
 
 # Listen on port 80
-app.listen 80
+app.listen 8080
 
 # Socket.io config
 socket = io.listen app
@@ -59,7 +59,13 @@ socket.on 'connection', (client) ->
     client.on 'message', (data) ->
         if data.message
             ircClient.say channel, data.message.message
-
+    
+    # For last 10 message, do a broadcast
+    for message in backLog[backLog.length - 10 ... backLog.length]
+        do (message) ->
+            [from, to, message] = message
+            sendMessage from, to, message
+            
 # Broadcast a received message
 sendMessage = (from, to, message) ->
     socket.broadcast message:
@@ -70,6 +76,7 @@ sendMessage = (from, to, message) ->
 # Broadcast messages received from IRC
 ircClient.addListener 'message', sendMessage
 
-# backLog = []
-# ircClient.addListener 'message', (from, to, message) ->
-#     backLog
+# manage a backlog
+backLog = []
+ircClient.addListener 'message', (from, to, message) ->
+    backLog.push [from, to, message]

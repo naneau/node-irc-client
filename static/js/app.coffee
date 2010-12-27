@@ -79,20 +79,22 @@ AppView = Backbone.View.extend
     
     # Input box key-up handler
     inputKey: (e) ->
+        
+        # Prevent default
         e.preventDefault() if e.keyCode is 13 
         
+        # Message has been entered and return pressed
         inputVal = $(e.target).val()
-        
         if e.keyCode is 13 and inputVal.length > 0
             
             # Create new message
             @inputList.add new Message 
                 message: inputVal, 
                 from: 'you'
-            
-            # Reset input box
-            $(e.target).val('')
-    
+        
+        # Reset input box
+        $(e.target).val('') if e.keyCode is 13 or e.keyCode is 27
+                
     # Resize elements
     resize: () ->
         @chatList.height $(window).height() - 120
@@ -101,7 +103,6 @@ AppView = Backbone.View.extend
         input.focus()
         input.width @chatList.width() - 15
         
-            
     # Render
     render: () ->
         dom = $(@template())
@@ -116,6 +117,7 @@ AppView = Backbone.View.extend
         # Include the rendered DOM in one go in our element
         @el.append dom
         
+        # This will still cause a redraw...
         @resize()
     
 # View for a single message

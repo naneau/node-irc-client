@@ -62,6 +62,8 @@
           message: inputVal,
           from: 'you'
         }));
+      }
+      if (e.keyCode === 13 || e.keyCode === 27) {
         return $(e.target).val('');
       }
     },

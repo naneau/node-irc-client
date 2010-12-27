@@ -10,7 +10,7 @@ table{border-collapse:collapse;border-spacing:0;}
 html,body{width:100%;}
 body{background-image:url(../img/bg.jpg);color:#fff;text-shadow:2px 2px 1px rgba(0, 0, 0, 0.4);font-family:Helvetica;}
 .irc{padding:20px;}
-ul.chat{padding:20px 0;overflow-y:auto;}
+ul.chat{padding:20px 0 0 0;margin:0 0 20px 0;overflow-y:auto;}
 .message{list-style:none;margin:0 0 6px 0;}
 .message .nick{width:100px;display:block;float:left;text-align:right;padding:0 10px 0 0;font-weight:bold;}
 input#message{width:300px;left:-1px;height:20px;background-color:rgba(255, 255, 255, 0.4);border:1px solid rgba(255, 255, 255, 0.5);-webkit-box-shadow:2px 2px 2px rgba(0, 0, 0, 0.3);border-radius:3px;padding:5px;color:#fff;font-size:1.2em;}
