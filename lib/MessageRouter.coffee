@@ -16,7 +16,7 @@ class MessageRouter
         @actions = {}
     
         # "Main" message handler, will match the action list
-        client.addListener 'message', _.bind @onMessage, this
+        @client.addListener 'message', _.bind @onMessage, this
     
     # Add a handler to the message router
     addHandler: (match, callback, scope) ->
@@ -33,10 +33,12 @@ class MessageRouter
         
     # Message handler
     onMessage: (from, to, message) ->
-        _.each @actions, (callbacks, match) ->
-            if message.match match
-                _.each callbacks, (callback) ->
-                    callback from, to, message
+        for match, callbacks in @actions
+            do (callbacks, match) ->
+                if message.match match
+                    for callback in callbacks
+                        do (callback) ->
+                            callback from, to, message
         
 # Export the messager outer
 module.exports = MessageRouter
