@@ -18,8 +18,9 @@ irc = require 'irc'
 # Bot
 Bot = require './app/InsultBot'
 
-# channel = '#zflounge';
-channel = '#naneautest';
+channel = process.argv[3] 
+channel ?= '#naneautest'
+
 nick = 'naneaubot';
 server = 'irc.freenode.net';
 
