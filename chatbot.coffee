@@ -24,14 +24,14 @@ nick = 'naneaubot';
 server = 'irc.freenode.net';
 
 # Instantiate the IRC Client
-client = new irc.Client server, nick, channels: [channel]
+ircClient = new irc.Client server, nick, channels: [channel]
 
 # Quick 'n dirty error handler
-client.addListener 'error', (error) ->
+ircClient.addListener 'error', (error) ->
     console.log error
 
 # # Create the insulting bot
-# bot = new Bot client, nick
+# bot = new Bot ircClient, nick
   
 # Express server
 app = express.createServer()
@@ -56,8 +56,12 @@ socket = io.listen app
 socket.on 'connection', (client) -> 
     sys.puts 'socket.io client connected'
     
+    client.on 'message', (data) ->
+        if data.message
+            ircClient.say channel, data.message.message
+
 # Broadcast messages received from IRC
-client.addListener 'message', (from, to, message) ->
+ircClient.addListener 'message', (from, to, message) ->
     socket.broadcast message:
         from: from
         to: to, 
