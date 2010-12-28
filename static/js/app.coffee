@@ -68,7 +68,7 @@ AppView = Backbone.View.extend
     renderMessage: (message) ->
         
         # We use an unordered list for the message
-        @chatList or= @$('ul');
+        @chatList or= @$('.chat');
         
         # Create a view for the message and render it
         message.view or= new MessageView model: message
@@ -108,7 +108,7 @@ AppView = Backbone.View.extend
         dom = $(@template())
         
         # Set chat list up as temporary (non-included) dom, so we can include it as a chunk (only one re-draw)
-        @chatList = dom.find 'ul'
+        @chatList = dom.find '.chat'
         
         # Render each message in the list
         @messageList.each (message) ->
@@ -118,7 +118,7 @@ AppView = Backbone.View.extend
         @el.append dom
         
         # This will still cause a redraw...
-        @resize()
+        # @resize()
     
 # View for a single message
 MessageView = Backbone.View.extend

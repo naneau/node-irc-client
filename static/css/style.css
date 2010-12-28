@@ -8,9 +8,17 @@ ins{text-decoration:none;}
 del{text-decoration:line-through;}
 table{border-collapse:collapse;border-spacing:0;}
 html,body{width:100%;}
-body{background-image:url(../img/bg.jpg);color:#fff;text-shadow:2px 2px 1px rgba(0, 0, 0, 0.4);font-family:Helvetica;}
-.irc{padding:20px;}
-ul.chat{padding:20px 0 0 0;margin:0 0 20px 0;overflow-y:auto;}
-.message{list-style:none;margin:0 0 6px 0;}
-.message .nick{width:100px;display:block;float:left;text-align:right;padding:0 10px 0 0;font-weight:bold;}
-input#message{width:300px;left:-1px;height:20px;background-color:rgba(255, 255, 255, 0.4);border:1px solid rgba(255, 255, 255, 0.5);-webkit-box-shadow:2px 2px 2px rgba(0, 0, 0, 0.3);border-radius:3px;padding:5px;color:#fff;font-size:1.2em;}
+body{font-family:"Helvetica Neue",Arial,Helvetica,Geneva,sans-serif;font-size:90%;}
+.irc{padding:0px;}
+#left,#right{position:absolute;}
+#left{background-image:url(../img/noise-stolen.png);-webkit-box-shadow:3px 0px 6px rgba(0, 0, 0, 0.4);color:#fff;height:100%;width:300px;border-right:1px solid #666;}
+#right{width:900px;height:100%;left:305px;}
+.wrap{padding:10px;}
+ul.channels{background-color:rgba(0, 0, 0, 0.2);border-radius:5px;padding:10px 10px 20px 10px;border:1px solid #555;}
+.channel{margin:0 0 0px 0;padding:10px 10px;position:relative;border-bottom:1px dotted #454545;text-shadow:1px 1px 1px rgba(0, 0, 0, 0.3);list-style-position:inside;list-style-type:square;font-weight:bold;}
+.channel.active{color:#bcdcef;}
+.channel .message-count{background-color:#7bbbdf;padding:4px 5px 5px 5px;border-radius:3px;color:#fff;text-shadow:1px 1px 1px rgba(0, 0, 0, 0.4);font-weight:bold;width:15px;text-align:center;position:absolute;right:0px;top:5px;}
+ul.chat{overflow-y:auto;background-color:#fff;color:#464648;}
+.message{list-style:none;display:block;position:relative;padding:5px 0 5px 150px;margin:0 0 5px 0;list-style-type:square;list-style-position:inside;}
+.message .nick{width:130px;border-radius:2px;display:block;left:0;top:0;position:absolute;text-align:right;font-weight:bold;background-color:#f3f3f3;border:1px solid #eee;text-shadow:1px 1px 1px rgba(255, 255, 255, 0.7);padding:3px 7px 5px 0px;}
+input#message{display:block;position:absolute;bottom:5px;left:10px;width:900px;border:1px solid #ccc;border-radius:3px;height:20px;padding:5px;font-size:1.2em;}

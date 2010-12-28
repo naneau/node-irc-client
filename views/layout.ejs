@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     
-    <title>Naneau's IRC</title>
+    <title>naneau's IRC</title>
     
     <link rel="stylesheet" href="css/style.css" />
     
@@ -43,11 +43,63 @@
     
     <script type="text/template" id="app-template">
         <section class="irc">
-            <ul class="chat"></ul>
+            <div id="left">
+                <div class="wrap">
+                    <ul class="channels">
+                        <li class="channel active">
+                            <span class="hash">#</span>zflounge
+                        </li>
+                        <li class="channel">
+                            #node.js
+                            <span class="message-count">4</span>
+                        </li>
+                        <li class="channel">
+                            #documentcloud
+                            <span class="message-count">19</span>
+                        </li>                                
+                    </ul>
+                </div>
+            </div>
             
-            <form>
-                <input type="text" id="message" autocomplete="off" />
-            </form>
+            <div id="right">
+                <div class="wrap">
+                    <ul class="chat">
+                        <li class="message">
+                            <span class="nick">naneau</span>
+                            blah blah blah bluh
+                        </li>                
+
+                        <li class="message">
+                            <span class="nick">naneau</span>
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit
+                        </li>                
+
+                        <li class="message">
+                            <span class="nick">naneau</span>
+                            sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        </li>                
+                        <li class="message">
+                            <span class="nick">naneau</span>
+                            blah blah blah bluh
+                        </li>                
+
+                        <li class="message">
+                            <span class="nick">naneau</span>
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit
+                        </li>                
+
+                        <li class="message">
+                            <span class="nick">naneau</span>
+                            sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        </li>                
+                
+                    </ul>
+            
+                    <form>
+                        <input type="text" id="message" autocomplete="off" />
+                    </form>
+                </div>
+            </div>            
         </section>
     </script>
     

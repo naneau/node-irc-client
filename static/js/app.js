@@ -43,7 +43,7 @@
       return this.renderMessage(message);
     },
     renderMessage: function(message) {
-      this.chatList || (this.chatList = this.$('ul'));
+      this.chatList || (this.chatList = this.$('.chat'));
       message.view || (message.view = new MessageView({
         model: message
       }));
@@ -77,12 +77,11 @@
     render: function() {
       var dom;
       dom = $(this.template());
-      this.chatList = dom.find('ul');
+      this.chatList = dom.find('.chat');
       this.messageList.each(function(message) {
         return renderMessage(message);
       });
-      this.el.append(dom);
-      return this.resize();
+      return this.el.append(dom);
     }
   });
   MessageView = Backbone.View.extend({
