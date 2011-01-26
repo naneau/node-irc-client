@@ -16,7 +16,7 @@
       this.socket.on('message', __bind(function(data) {
         console.log(data);
         if (data.message === 'channelMessage') {
-          return this.channelList.addMessage(data.to, data.text);
+          return this.channelList.addMessage(data.to, data.text, data.from);
         } else if (data.message === 'channelList') {
           return this.channelList.initWithChannelList(data.channels);
         }
@@ -29,8 +29,21 @@
   AppView = Backbone.View.extend({
     initialize: function(options) {
       this.channelList = options.channelList;
-      this.channelList.bind('add', this.render);
-      return this.template = _.template($('#app-template').html());
+      this.template = _.template($('#app-template').html());
+      return this.channelList.bind('change:active', __bind(function() {
+        return this.renderChannel();
+      }, this));
+    },
+    renderChannel: function() {
+      var channel;
+      channel = this.channelList.getActive();
+      if (!(channel.chatView != null)) {
+        channel.chatView = new ChatView({
+          el: this.$('#channel'),
+          channel: channel
+        });
+      }
+      return channel.chatView.render();
     },
     render: function() {
       var dom;
@@ -40,15 +53,7 @@
         el: dom.find('#channel-list'),
         model: this.channelList
       });
-      this.channelListView.render();
-      if (this.channelList.first() != null) {
-        this.ChatView = new ChatView({
-          el: dom.find('.chat'),
-          messageList: this.channelList.first().messageList,
-          inputList: this.channelList.first().inputList
-        });
-        return this.ChatView.render();
-      }
+      return this.channelListView.render();
     }
   });
   Channel = Backbone.Model.extend({
@@ -59,8 +64,11 @@
       this.messageList = new MessageList;
       return this.inputList = new MessageList;
     },
-    addMessage: function(message) {
-      return this.messageList.add(new Message(message));
+    addMessage: function(message, from) {
+      return this.messageList.add(new Message({
+        message: message,
+        from: from
+      }));
     }
   });
   ChannelList = Backbone.Collection.extend({
@@ -109,19 +117,19 @@
       }
       return channel;
     },
-    addMessage: function(channel, message) {
+    addMessage: function(channel, message, from) {
       if (!(channel instanceof Channel)) {
         channel = this.getChannel(channel);
       }
-      return channel.addMessage(message);
+      return channel.addMessage(message, from);
     },
     getActive: function() {
       var active;
       if (this.length = 0) {
         throw 'No channels, can\'t retrieve active';
       }
-      active = this.any(function(channel) {
-        return this.get('active');
+      active = this.detect(function(channel) {
+        return channel.get('active');
       });
       if (!(active != null)) {
         return this.first();
@@ -226,14 +234,16 @@
     },
     initialize: function(options) {
       _.bindAll(this, 'render', 'newMessage', 'renderMessage', 'inputKey');
-      this.messageList = options.messageList;
-      this.inputList = options.inputList;
+      this.template = _.template($('#chat-template').html());
+      this.messageList = options.channel.messageList;
+      this.inputList = options.channel.inputList;
       return this.messageList.bind('add', this.newMessage);
     },
     newMessage: function(message) {
       return this.renderMessage(message);
     },
     renderMessage: function(message) {
+      console.log('rendering message', message);
       this.chatList || (this.chatList = this.$('.chat'));
       message.view || (message.view = new MessageView({
         model: message
@@ -266,9 +276,11 @@
       return input.width(this.chatList.width() - 15);
     },
     render: function() {
-      return this.messageList.each(function(message) {
-        return renderMessage(message);
-      });
+      this.el.html(this.template());
+      this.chatList = this.$('ul');
+      return this.messageList.each(__bind(function(message) {
+        return this.renderMessage(message);
+      }, this));
     }
   });
 }).call(this);

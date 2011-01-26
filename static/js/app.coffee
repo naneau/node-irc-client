@@ -28,7 +28,7 @@ class IRCApp
             
             # Incoming message for a channel
             if data.message is 'channelMessage'
-                @channelList.addMessage data.to, data.text
+                @channelList.addMessage data.to, data.text, data.from
             
             # The list of channels we're connected to
             else if data.message is 'channelList'
@@ -49,10 +49,25 @@ AppView = Backbone.View.extend
         # Channel List
         @channelList = options.channelList
         
-        @channelList.bind 'add', @render
-        
         # Create template
         @template = _.template $('#app-template').html()
+        
+        @channelList.bind 'change:active', () =>
+            @renderChannel()
+    
+    # Render a channel
+    renderChannel: () ->
+        channel = @channelList.getActive()
+        
+        # Create the channel's chat-view if it doesn't exist already
+        if not channel.chatView?
+            
+            channel.chatView = new ChatView
+                el: (@$ '#channel'),
+                channel: channel
+        
+        # Render
+        channel.chatView.render()
     
     # Render
     render: () ->
@@ -70,19 +85,6 @@ AppView = Backbone.View.extend
         
         @channelListView.render()
         
-        # If we have channels to render
-        if @channelList.first()?
-            
-            
-            # Main view for the application
-            @ChatView = new ChatView
-                el: (dom.find '.chat'),
-                messageList: @channelList.first().messageList,
-                inputList: @channelList.first().inputList
-        
-            # Render
-            @ChatView.render()
-        
 # An IRC Channel
 Channel = Backbone.Model.extend
 
@@ -96,8 +98,10 @@ Channel = Backbone.Model.extend
         @inputList = new MessageList
     
     # Add a message
-    addMessage: (message) ->
-        @messageList.add new Message message
+    addMessage: (message, from) ->
+        @messageList.add new Message 
+            message: message, 
+            from: from
         
 # List of Channels
 ChannelList = Backbone.Collection.extend
@@ -151,12 +155,12 @@ ChannelList = Backbone.Collection.extend
         channel
         
     # Add a message to a channel
-    addMessage: (channel, message) ->
+    addMessage: (channel, message, from) ->
         
         # Fetch channel if string is given
         channel = @getChannel channel if channel not instanceof Channel
         
-        channel.addMessage message
+        channel.addMessage message, from
         
     # Get the active channel
     getActive: () ->
@@ -164,9 +168,9 @@ ChannelList = Backbone.Collection.extend
         # Make sure we have at least one
         throw 'No channels, can\'t retrieve active' if @length = 0
         
-        active = @any (channel) ->
-            @get 'active'
-            
+        active = @detect (channel) ->
+            channel.get 'active'
+
         return @first() if not active?
         
         active
@@ -298,14 +302,16 @@ ChatView = Backbone.View.extend
     # Initialize
     initialize: (options) ->
         _.bindAll this, 'render', 'newMessage', 'renderMessage', 'inputKey'
-
+        
+        # Template for the chat list
+        @template = _.template($('#chat-template').html())
+        
         # Get stuff out of the options
-        @messageList = options.messageList
-        @inputList = options.inputList
+        @messageList = options.channel.messageList
+        @inputList = options.channel.inputList
 
         # When a message is received, render it
         @messageList.bind 'add', @newMessage
-
 
     # New message has been added to the list
     newMessage: (message) ->
@@ -313,7 +319,9 @@ ChatView = Backbone.View.extend
 
     # Render the message
     renderMessage: (message) ->
-
+        
+        console.log 'rendering message', message
+        
         # We use an unordered list for the message
         @chatList or= @$('.chat');
 
@@ -352,6 +360,10 @@ ChatView = Backbone.View.extend
 
     # Render
     render: () ->
+        @el.html @template()
+        
+        @chatList = @$ 'ul'
+        
         # Render each message in the list
-        @messageList.each (message) ->
-            renderMessage message
+        @messageList.each (message) =>
+            @renderMessage message
