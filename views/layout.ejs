@@ -45,72 +45,17 @@
         <section class="app">
         
             <div id="left">
-                <div class="wrap">
-                    <h2>Channels</h2>
-                    <ul class="channels">
-                        <li class="channel">
-                            #node.js
-                            <span class="message-count">4</span>
-                        </li>
-                        <li class="channel active">
-                            <span class="hash">#</span>zflounge
-                        </li>
-                        
-                        <li class="channel">
-                            #documentcloud
-                            <span class="message-count">19</span>
-                        </li>                                
-                        
-                        <li class="channel">
-                            #loremipsum
-                            <span class="message-count">1</span>
-                        </li>                                
-
-                        <li class="channel">
-                            #blahtest
-                            <span class="message-count">97</span>
-                        </li>                                
-                        <li class="channel">
-                            #cloudstuff
-                            <span class="message-count">23</span>
-                        </li>                                
-                        
-                    </ul>
+            
+                <div class="wrap" id="channel-list">
+                    
                 </div>
+                
             </div>
             
             <div id="right">
                 <div class="wrap">
                     <ul class="chat">
                         <h2>#zflounge</h2>
-                        <li class="message">
-                            <span class="nick">naneau</span>
-                            blah blah blah bluh
-                        </li>                
-
-                        <li class="message">
-                            <span class="nick">mirmo</span>
-                            Lorem ipsum dolor sit amet, consectetur adipisicing elit
-                        </li>                
-
-                        <li class="message">
-                            <span class="nick">norm2782</span>
-                            sunt in culpa qui officia deserunt mollit anim id est laborum.
-                        </li>                
-                        <li class="message">
-                            <span class="nick">naneau</span>
-                            blah blah blah bluh
-                        </li>                
-
-                        <li class="message">
-                            <span class="nick">naneau</span>
-                            Lorem ipsum dolor sit amet, consectetur adipisicing elit
-                        </li>                
-
-                        <li class="message">
-                            <span class="nick">naneau</span>
-                            sunt in culpa qui officia deserunt mollit anim id est laborum.
-                        </li>                
                 
                     </ul>
             
@@ -127,6 +72,18 @@
             <span class="nick">{{from}}</span>
             {{message}}
         </li>
+    </script>
+    
+    <script type="text/template" id="channel-list-template">
+        <section class="conversations">
+
+            <h2>Conversations</h2>
+            <ul>
+        
+            </ul>
+        
+        </section>
+    
     </script>
 </body>
 </html>

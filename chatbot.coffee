@@ -18,14 +18,15 @@ irc = require 'irc'
 # Bot
 Bot = require './app/InsultBot'
 
-channel = process.argv[3] 
-channel ?= '#naneautest'
+# channel = process.argv[3] 
+# channel ?= '#naneautest'
+channels = ['#naneautest', '#naneautest2','#naneautest3']
 
 nick = 'naneaubot';
 server = 'irc.freenode.net';
 
 # Instantiate the IRC Client
-ircClient = new irc.Client server, nick, channels: [channel]
+ircClient = new irc.Client server, nick, channels: channels
 
 # Quick 'n dirty error handler
 ircClient.addListener 'error', (error) ->
@@ -61,26 +62,31 @@ socket.on 'connection', (client) ->
     sys.puts 'socket.io client connected'
     
     client.on 'message', (data) ->
-        if data.message
+        if data.message?
             ircClient.say channel, data.message.message
     
-    # For last 10 message, do a broadcast
-    for message in backLog[backLog.length - 10 ... backLog.length]
-        do (message) ->
-            [from, to, message] = message
-            sendMessage from, to, message
-            
+    # Send the channel list
+    client.send 
+        message: 'channelList'
+        channels: channels
+    
 # Broadcast a received message
 sendMessage = (from, to, message) ->
-    socket.broadcast message:
+    socket.broadcast 
+        message: 'channelMessage',
         from: from
         to: to, 
-        message: message
+        text: message
 
 # Broadcast messages received from IRC
 ircClient.addListener 'message', sendMessage
 
-# manage a backlog
-backLog = []
-ircClient.addListener 'message', (from, to, message) ->
-    backLog.push [from, to, message]
+# # manage a backlog
+# backLog = []
+# ircClient.addListener 'message', (from, to, message) ->
+#     backLog.push [from, to, message]
+# For last 10 message, do a broadcast
+# for message in backLog[backLog.length - 10 ... backLog.length]
+#     do (message) ->
+#         [from, to, message] = message
+#         sendMessage from, to, message

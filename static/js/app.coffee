@@ -1,125 +1,272 @@
 # Application class
 class IRCApp
     
-    # Constructor
+    # Constructor, gets passed the DOM element we want to render into
     constructor: (element) ->
         
+        # List of channels
+        @channelList = new ChannelList
+        
+        # Set up socket and message handling
+        @setupSocket()
+        
+        # Set up our view, passing along the relevant lists and such
+        @appView = new AppView
+            el: element,
+            channelList: @channelList
+            
+        # Render App View
+        @appView.render()
+    
+    setupSocket: () ->
         # Create socket connection
         @socket = new io.Socket;
         
-        # List of messages received
-        @messageList = new MessageList;
-        
-        # List of messages (to be) sent
-        @inputList = new MessageList;
-        
-        # When a new message is added to the input list, send it to the server, but also show it as a message
-        @inputList.bind 'add', (message) =>
-            @socket.send message: message.toJSON()
-            
-            # We have to "clone" the message here, before adding it to our own message list
-            @messageList.add new Message message.toJSON()
-        
         # Message handler
         @socket.on 'message', (data) =>
-            if data['message']
-                @messageList.add new Message data['message']
-        
-        # Main view for the application
-        @appView = new AppView
-            el: element,
-            messageList: @messageList,
-            inputList: @inputList
-        
-        # Render
-        @appView.render()
-        
+            console.log data
+            
+            # Incoming message for a channel
+            if data.message is 'channelMessage'
+                @channelList.addMessage data.to, data.text
+            
+            # The list of channels we're connected to
+            else if data.message is 'channelList'
+                # re-init the channel list
+                @channelList.initWithChannelList data.channels
+                
         # Connect the socket
         @socket.connect()
         
 window.IRCApp = IRCApp
 
-# Main "chat list" view
+# Application view
 AppView = Backbone.View.extend
     
-    # Event hash
-    events:
-        'keydown     input':     'inputKey'
-        
-    # Initialize
+    # Constructor like
     initialize: (options) ->
-        _.bindAll this, 'render', 'newMessage', 'renderMessage', 'inputKey'
         
-        # Get stuff out of the options
-        @messageList = options.messageList
-        @inputList = options.inputList
+        # Channel List
+        @channelList = options.channelList
         
-        # When a message is received, render it
-        @messageList.bind 'add', @newMessage
+        @channelList.bind 'add', @render
         
         # Create template
         @template = _.template $('#app-template').html()
-        
-    # New message has been added to the list
-    newMessage: (message) ->
-        @renderMessage message
     
-    # Render the message
-    renderMessage: (message) ->
-        
-        # We use an unordered list for the message
-        @chatList or= @$('.chat');
-        
-        # Create a view for the message and render it
-        message.view or= new MessageView model: message
-        message.view.render()
-        
-        @chatList.append message.view.el
-        @chatList.attr 'scrollTop', @chatList.attr 'scrollHeight'
-    
-    # Input box key-up handler
-    inputKey: (e) ->
-        
-        # Prevent default
-        e.preventDefault() if e.keyCode is 13 
-        
-        # Message has been entered and return pressed
-        inputVal = $(e.target).val()
-        if e.keyCode is 13 and inputVal.length > 0
-            
-            # Create new message
-            @inputList.add new Message 
-                message: inputVal, 
-                from: 'you'
-        
-        # Reset input box
-        $(e.target).val('') if e.keyCode is 13 or e.keyCode is 27
-                
-    # Resize elements
-    resize: () ->
-        @chatList.height $(window).height() - 120
-        
-        input = @$ 'input'
-        input.focus()
-        input.width @chatList.width() - 15
-        
     # Render
+    render: () ->
+        
+        # Our dom
+        dom = $(@template())
+        
+        # Include the rendered DOM in one go in our element
+        @el.html dom
+        
+        # Channel List
+        @channelListView = new ChannelListView
+            el: (dom.find '#channel-list'),
+            model: @channelList
+        
+        @channelListView.render()
+        
+        # If we have channels to render
+        if @channelList.first()?
+            
+            
+            # Main view for the application
+            @ChatView = new ChatView
+                el: (dom.find '.chat'),
+                messageList: @channelList.first().messageList,
+                inputList: @channelList.first().inputList
+        
+            # Render
+            @ChatView.render()
+        
+# An IRC Channel
+Channel = Backbone.Model.extend
+
+    # Constructor
+    initialize: () ->
+        
+        @set active: false
+        
+        @messageList = new MessageList
+        
+        @inputList = new MessageList
+    
+    # Add a message
+    addMessage: (message) ->
+        @messageList.add new Message message
+        
+# List of Channels
+ChannelList = Backbone.Collection.extend
+
+    model: Channel
+    
+    # Constructor
+    initialize: () ->
+        
+        # There can only be one channel active
+        @bind 'change:active', (activeChannel, active) =>
+            if active
+                @each (channel) =>
+                    if channel.get('id') isnt activeChannel.get('id')
+                        channel.set active: false
+            
+    # Create a channel
+    createChannel: (name) ->
+        
+        # Channels get an ID that's really their name, for easy retreival
+        channel = new Channel
+            id: name,
+            name: name
+        
+        # Listen to new messages in the channel's input list
+        channel.inputList.bind 'add', (message) =>
+            @trigger 'channelInput', channel, message
+            
+        channel
+    
+    # (Re-) init with a list of channel names
+    initWithChannelList: (names) ->
+        
+        # Create an array of new channel lists
+        channels = []
+        for name in names
+            do (name) =>
+                channels.push @createChannel name
+        
+        # "Refresh" ourselves with that list
+        @refresh channels
+    
+    # Get a channel by name, with lazy init
+    getChannel: (name) ->
+        channel = @get name
+        
+        # Create if it doesn't exist
+        if not channel?
+            @add @createChannel name
+        
+        channel
+        
+    # Add a message to a channel
+    addMessage: (channel, message) ->
+        
+        # Fetch channel if string is given
+        channel = @getChannel channel if channel not instanceof Channel
+        
+        channel.addMessage message
+        
+    # Get the active channel
+    getActive: () ->
+        
+        # Make sure we have at least one
+        throw 'No channels, can\'t retrieve active' if @length = 0
+        
+        active = @any (channel) ->
+            @get 'active'
+            
+        return @first() if not active?
+        
+        active
+    
+    # Make a channel active
+    makeActive: (channel) ->
+        
+        # Make sure all other channels aren't active
+        @each (channel) ->
+            channel.set active:false
+        
+        # Retrieve if string given
+        channel = @getChannel channel if channel not instanceof Channel
+        
+        # Make the channel active
+        channel.set active:true
+        
+# Single channel's view in the list of channels
+ChannelView = Backbone.View.extend
+
+    # Evet hash
+    events: 
+        'click':      'makeActive'
+    
+    tagName: 'li'
+    className: 'irc-channel'
+        
+    # Initialize
+    initialize: () ->
+        # Track active state
+        @model.bind 'change:active', () =>
+            if @model.get 'active'
+                $(@el).addClass 'active'
+            else 
+                $(@el).removeClass 'active'
+    
+    # Make our model active if it isn't already
+    makeActive: () ->
+        if not @model.get 'active'
+            @model.set active: true
+            
+    # Render
+    render: () ->
+        $(@el).text @model.get 'name'
+        
+        this
+
+# View for the channel list
+ChannelListView = Backbone.View.extend
+
+    # Init
+    initialize: () ->
+        # Template
+        @template = _.template $('#channel-list-template').html()
+        
+        # @model.bind 'add', @render
+        @model.bind 'refresh', () =>
+            @render()
+        
+    # Change conversation
+    changeConversation: (e) ->
+        e.preventDefault()
+
+        li = $(e.target).closest 'li'
+
+        # Remove active from all
+        all = @$ '.conversations li'
+        all.removeClass 'active'
+
+        # Add it to our target
+        li.addClass 'active'
+        
     render: () ->
         dom = $(@template())
         
-        # Set chat list up as temporary (non-included) dom, so we can include it as a chunk (only one re-draw)
-        @chatList = dom.find '.chat'
+        list = dom.find 'ul'
         
-        # Render each message in the list
-        @messageList.each (message) ->
-            renderMessage message
+        # Render each channel separately
+        @model.each (channel) ->
             
-        # Include the rendered DOM in one go in our element
-        @el.append dom
-        
-        # This will still cause a redraw...
-        # @resize()
-    
+            # Create the channel's view if it doesn't exist already
+            if not channel.view?
+                channel.view = new ChannelView
+                    model: channel
+            
+            # Render
+            channel.view.render()
+            
+            # Append the rendered element to the list
+            list.append  channel.view.el
+            
+        @el.html dom
+
+# A single Message
+Message = Backbone.Model.extend
+
+    # Init
+    initialize: () ->
+        @set read: false
+
 # View for a single message
 MessageView = Backbone.View.extend
 
@@ -137,9 +284,74 @@ MessageView = Backbone.View.extend
         
         return this
 
-# A single Message
-Message = Backbone.Model.extend()
-
 # Collection of Messages
 MessageList = Backbone.Collection.extend
     model: Message
+    
+# Main "chat list" view
+ChatView = Backbone.View.extend
+
+    # Event hash
+    events:
+        'keydown     input':                'inputKey'
+
+    # Initialize
+    initialize: (options) ->
+        _.bindAll this, 'render', 'newMessage', 'renderMessage', 'inputKey'
+
+        # Get stuff out of the options
+        @messageList = options.messageList
+        @inputList = options.inputList
+
+        # When a message is received, render it
+        @messageList.bind 'add', @newMessage
+
+
+    # New message has been added to the list
+    newMessage: (message) ->
+        @renderMessage message
+
+    # Render the message
+    renderMessage: (message) ->
+
+        # We use an unordered list for the message
+        @chatList or= @$('.chat');
+
+        # Create a view for the message and render it
+        message.view or= new MessageView model: message
+        message.view.render()
+
+        @chatList.append message.view.el
+        @chatList.attr 'scrollTop', @chatList.attr 'scrollHeight'
+
+    # Input box key-up handler
+    inputKey: (e) ->
+
+        # Prevent default
+        e.preventDefault() if e.keyCode is 13 
+
+        # Message has been entered and return pressed
+        inputVal = $(e.target).val()
+        if e.keyCode is 13 and inputVal.length > 0
+
+            # Create new message
+            @inputList.add new Message 
+                message: inputVal, 
+                from: 'you'
+
+        # Reset input box
+        $(e.target).val('') if e.keyCode is 13 or e.keyCode is 27
+
+    # Resize elements
+    resize: () ->
+        @chatList.height $(window).height() - 120
+
+        input = @$ 'input'
+        input.focus()
+        input.width @chatList.width() - 15
+
+    # Render
+    render: () ->
+        # Render each message in the list
+        @messageList.each (message) ->
+            renderMessage message
