@@ -3,7 +3,9 @@ body ->
     html ->
       head ->
         meta charset: 'utf-8'
-        title "#{@title or 'IRC'} "
+        
+        title "#{@title or 'IRC'}"
+        
         link rel: 'stylesheet', href: '/css/style.css'
         
         # Libraries

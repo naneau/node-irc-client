@@ -8,7 +8,7 @@ class IRCApp
         @channelList = new ChannelList
         
         # Set up socket and message handling
-        @setupSocket()
+        do @setupSocket
         
         # Set up our view, passing along the relevant lists and such
         @appView = new AppView
@@ -16,7 +16,7 @@ class IRCApp
             channelList: @channelList
             
         # Render App View
-        @appView.render()
+        do @appView.render
     
     setupSocket: () ->
         # Create socket connection
@@ -35,7 +35,7 @@ class IRCApp
                 @channelList.initWithChannelList data.channels
                 
         # Connect the socket
-        @socket.connect()
+        do @socket.connect
         
 window.IRCApp = IRCApp
 
@@ -60,11 +60,11 @@ AppView = Backbone.View.extend
         @channelList = options.channelList
         
         @channelList.bind 'change:active', () =>
-            @renderChannel()
+            do @renderChannel
     
     # Render a channel
     renderChannel: () ->
-        channel = @channelList.getActive()
+        channel = do @channelList.getActive
         
         # Create the channel's chat-view if it doesn't exist already
         if not channel.chatView?
@@ -74,7 +74,7 @@ AppView = Backbone.View.extend
                 channel: channel
         
         # Render
-        channel.chatView.render()
+        do channel.chatView.render
     
     # Render
     render: () ->
@@ -90,7 +90,7 @@ AppView = Backbone.View.extend
             el: (dom.find '#channel-list'),
             model: @channelList
         
-        @channelListView.render()
+        do @channelListView.render
         
 # An IRC Channel
 Channel = Backbone.Model.extend
@@ -180,7 +180,7 @@ ChannelList = Backbone.Collection.extend
         active = @detect (channel) ->
             channel.get 'active'
 
-        return @first() if not active?
+        return do @first if not active?
         
         active
     
@@ -235,11 +235,11 @@ ChannelListView = Backbone.View.extend
     initialize: () ->
         # @model.bind 'add', @render
         @model.bind 'refresh', () =>
-            @render()
+            do @render
         
     # Change conversation
     changeConversation: (e) ->
-        e.preventDefault()
+        do e.preventDefault
 
         li = $(e.target).closest 'li'
 
@@ -264,7 +264,7 @@ ChannelListView = Backbone.View.extend
                     model: channel
             
             # Render
-            channel.view.render()
+            do channel.view.render
             
             # Append the rendered element to the list
             list.append  channel.view.el
@@ -288,7 +288,7 @@ MessageView = Backbone.View.extend
     # Render through the template
     render: () ->
         # In this case we replace the entire node, since it's not in the dom anyway
-        @el = $ Template::renderTemplate 'message', @model.toJSON()
+        @el = $ Template::renderTemplate 'message', do @model.toJSON
         
         return this
 
@@ -327,7 +327,7 @@ ChatView = Backbone.View.extend
 
         # Create a view for the message and render it
         message.view or= new MessageView model: message
-        message.view.render()
+        do message.view.render
 
         @chatList.append message.view.el
         @chatList.attr 'scrollTop', @chatList.attr 'scrollHeight'
@@ -336,10 +336,10 @@ ChatView = Backbone.View.extend
     inputKey: (e) ->
 
         # Prevent default
-        e.preventDefault() if e.keyCode is 13 
+        do e.preventDefault if e.keyCode is 13 
 
         # Message has been entered and return pressed
-        inputVal = $(e.target).val()
+        inputVal = do $(e.target).val
         if e.keyCode is 13 and inputVal.length > 0
 
             # Create new message
@@ -355,7 +355,7 @@ ChatView = Backbone.View.extend
         @chatList.height $(window).height() - 120
 
         input = @$ 'input'
-        input.focus()
+        do input.focus
         input.width @chatList.width() - 15
 
     # Render
