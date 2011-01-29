@@ -24,8 +24,7 @@ class IRCApp
         
         # Message handler
         @socket.on 'message', (data) =>
-            # console.log data
-            # 
+        
             # Incoming message for a channel
             if data.message is 'channelMessage'
                 @channelList.addMessage data.to, data.text, data.from
@@ -151,7 +150,9 @@ ChannelList = Backbone.Collection.extend
         
         # "Refresh" ourselves with that list
         @refresh channels
-    
+        
+        @makeActive do @first if do @first
+        
     # Get a channel by name, with lazy init
     getChannel: (name) ->
         channel = @get name
@@ -307,6 +308,7 @@ ChatView = Backbone.View.extend
         _.bindAll this, 'render', 'newMessage', 'renderMessage', 'inputKey'
         
         # Get stuff out of the options
+        @channel = options.channel
         @messageList = options.channel.messageList
         @inputList = options.channel.inputList
 
@@ -319,8 +321,6 @@ ChatView = Backbone.View.extend
 
     # Render the message
     renderMessage: (message) ->
-        
-        console.log 'rendering message', message
         
         # We use an unordered list for the message
         @chatList or= @$('.chat');
@@ -360,7 +360,7 @@ ChatView = Backbone.View.extend
 
     # Render
     render: () ->
-        @el.html Template::renderTemplate 'chat'
+        @el.html Template::renderTemplate 'chat', do @channel.toJSON
         
         @chatList = @$ 'ul'
         

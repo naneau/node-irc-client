@@ -118,7 +118,10 @@
         name = names[_i];
         _fn(name);
       }
-      return this.refresh(channels);
+      this.refresh(channels);
+      if (this.first()) {
+        return this.makeActive(this.first());
+      }
     },
     getChannel: function(name) {
       var channel;
@@ -243,6 +246,7 @@
     },
     initialize: function(options) {
       _.bindAll(this, 'render', 'newMessage', 'renderMessage', 'inputKey');
+      this.channel = options.channel;
       this.messageList = options.channel.messageList;
       this.inputList = options.channel.inputList;
       return this.messageList.bind('add', this.newMessage);
@@ -251,7 +255,6 @@
       return this.renderMessage(message);
     },
     renderMessage: function(message) {
-      console.log('rendering message', message);
       this.chatList || (this.chatList = this.$('.chat'));
       message.view || (message.view = new MessageView({
         model: message
@@ -284,7 +287,7 @@
       return input.width(this.chatList.width() - 15);
     },
     render: function() {
-      this.el.html(Template.prototype.renderTemplate('chat'));
+      this.el.html(Template.prototype.renderTemplate('chat', this.channel.toJSON()));
       this.chatList = this.$('ul');
       return this.messageList.each(__bind(function(message) {
         return this.renderMessage(message);

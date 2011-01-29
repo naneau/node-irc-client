@@ -1,5 +1,3 @@
-console.log this
-
 templates = {}
 
 templates.app = () ->
@@ -9,10 +7,11 @@ templates.app = () ->
 
         div id: 'right', ->
             div class: 'wrap', id: 'channel'
+                
 # Template for a chat
 templates.chat = () ->
     ul class: 'chat', ->
-        h2 -> '#zflounge'
+        h2 -> @name
     
     form ->
         input type: 'text', id: 'message', autocomplete: 'off'

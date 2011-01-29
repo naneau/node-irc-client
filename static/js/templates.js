@@ -135,8 +135,7 @@ var __indexOf = Array.prototype.indexOf || function(item) {
     coffeescript = function(code) {
       return script(";(" + code + ")();");
     };
-    var a,div,em,form,h2,i,input,li,ol,p,s,section,span,th,u,ul;a = function(){return ck_tag('a', arguments)};div = function(){return ck_tag('div', arguments)};em = function(){return ck_tag('em', arguments)};form = function(){return ck_tag('form', arguments)};h2 = function(){return ck_tag('h2', arguments)};i = function(){return ck_tag('i', arguments)};input = function(){return ck_tag('input', arguments)};li = function(){return ck_tag('li', arguments)};ol = function(){return ck_tag('ol', arguments)};p = function(){return ck_tag('p', arguments)};s = function(){return ck_tag('s', arguments)};section = function(){return ck_tag('section', arguments)};span = function(){return ck_tag('span', arguments)};th = function(){return ck_tag('th', arguments)};u = function(){return ck_tag('u', arguments)};ul = function(){return ck_tag('ul', arguments)};(function(){var templates;
-console.log(this);
+    var a,div,em,form,h2,i,input,li,p,s,section,span,th,u,ul;a = function(){return ck_tag('a', arguments)};div = function(){return ck_tag('div', arguments)};em = function(){return ck_tag('em', arguments)};form = function(){return ck_tag('form', arguments)};h2 = function(){return ck_tag('h2', arguments)};i = function(){return ck_tag('i', arguments)};input = function(){return ck_tag('input', arguments)};li = function(){return ck_tag('li', arguments)};p = function(){return ck_tag('p', arguments)};s = function(){return ck_tag('s', arguments)};section = function(){return ck_tag('section', arguments)};span = function(){return ck_tag('span', arguments)};th = function(){return ck_tag('th', arguments)};u = function(){return ck_tag('u', arguments)};ul = function(){return ck_tag('ul', arguments)};(function(){var templates;
 templates = {};
 templates.app = function() {
   return section({
@@ -165,7 +164,7 @@ templates.chat = function() {
     "class": 'chat'
   }, function() {
     return h2(function() {
-      return '#zflounge';
+      return this.name;
     });
   });
   return form(function() {
