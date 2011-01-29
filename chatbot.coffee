@@ -41,8 +41,9 @@ app = express.createServer()
 # Set static files directory
 app.use express.staticProvider __dirname + '/static' 
 
-# Use EJS templating
-app.set 'view engine', 'ejs'
+# Use CoffeeKup templating
+app.register '.coffee', require 'coffeekup'
+app.set 'view engine', 'coffee'
 
 # Root request triggers a simple render (App is all in Backbone.js through Socket.io)
 app.get '/', (request, response) ->
@@ -81,12 +82,18 @@ sendMessage = (from, to, message) ->
 # Broadcast messages received from IRC
 ircClient.addListener 'message', sendMessage
 
-# # manage a backlog
-# backLog = []
+# manage a backlog
+backlogs = {}
+
+
 # ircClient.addListener 'message', (from, to, message) ->
-#     backLog.push [from, to, message]
-# For last 10 message, do a broadcast
+#      backLog.push [from, to, message]
+# # For last 10 message, do a broadcast
 # for message in backLog[backLog.length - 10 ... backLog.length]
 #     do (message) ->
 #         [from, to, message] = message
 #         sendMessage from, to, message
+# 
+# 
+# 
+# # backLog = []

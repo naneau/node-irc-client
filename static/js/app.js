@@ -1,5 +1,5 @@
 (function() {
-  var AppView, Channel, ChannelList, ChannelListView, ChannelView, ChatView, IRCApp, Message, MessageList, MessageView;
+  var AppView, Channel, ChannelList, ChannelListView, ChannelView, ChatView, IRCApp, Message, MessageList, MessageView, Template;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   IRCApp = (function() {
     function IRCApp(element) {
@@ -14,7 +14,6 @@
     IRCApp.prototype.setupSocket = function() {
       this.socket = new io.Socket;
       this.socket.on('message', __bind(function(data) {
-        console.log(data);
         if (data.message === 'channelMessage') {
           return this.channelList.addMessage(data.to, data.text, data.from);
         } else if (data.message === 'channelList') {
@@ -26,10 +25,22 @@
     return IRCApp;
   })();
   window.IRCApp = IRCApp;
+  Template = (function() {
+    function Template() {}
+    Template.prototype.renderTemplate = function(name, templateContext) {
+      if (templateContext == null) {
+        templateContext = {};
+      }
+      templateContext.template = name;
+      return window.template({
+        context: templateContext
+      });
+    };
+    return Template;
+  })();
   AppView = Backbone.View.extend({
     initialize: function(options) {
       this.channelList = options.channelList;
-      this.template = _.template($('#app-template').html());
       return this.channelList.bind('change:active', __bind(function() {
         return this.renderChannel();
       }, this));
@@ -47,7 +58,7 @@
     },
     render: function() {
       var dom;
-      dom = $(this.template());
+      dom = $(Template.prototype.renderTemplate('app'));
       this.el.html(dom);
       this.channelListView = new ChannelListView({
         el: dom.find('#channel-list'),
@@ -179,7 +190,6 @@
   });
   ChannelListView = Backbone.View.extend({
     initialize: function() {
-      this.template = _.template($('#channel-list-template').html());
       return this.model.bind('refresh', __bind(function() {
         return this.render();
       }, this));
@@ -194,7 +204,7 @@
     },
     render: function() {
       var dom, list;
-      dom = $(this.template());
+      dom = $(Template.prototype.renderTemplate('channelList'));
       list = dom.find('ul');
       this.model.each(function(channel) {
         if (!(channel.view != null)) {
@@ -217,11 +227,10 @@
   });
   MessageView = Backbone.View.extend({
     initialize: function(options) {
-      _.bindAll(this, 'render');
-      return this.template = _.template($('#message-template').html());
+      return _.bindAll(this, 'render');
     },
     render: function() {
-      this.el = $(this.template(this.model.toJSON()));
+      this.el = $(Template.prototype.renderTemplate('message', this.model.toJSON()));
       return this;
     }
   });
@@ -234,7 +243,6 @@
     },
     initialize: function(options) {
       _.bindAll(this, 'render', 'newMessage', 'renderMessage', 'inputKey');
-      this.template = _.template($('#chat-template').html());
       this.messageList = options.channel.messageList;
       this.inputList = options.channel.inputList;
       return this.messageList.bind('add', this.newMessage);
@@ -276,7 +284,7 @@
       return input.width(this.chatList.width() - 15);
     },
     render: function() {
-      this.el.html(this.template());
+      this.el.html(Template.prototype.renderTemplate('chat'));
       this.chatList = this.$('ul');
       return this.messageList.each(__bind(function(message) {
         return this.renderMessage(message);

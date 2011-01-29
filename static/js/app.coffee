@@ -24,8 +24,8 @@ class IRCApp
         
         # Message handler
         @socket.on 'message', (data) =>
-            console.log data
-            
+            # console.log data
+            # 
             # Incoming message for a channel
             if data.message is 'channelMessage'
                 @channelList.addMessage data.to, data.text, data.from
@@ -40,6 +40,17 @@ class IRCApp
         
 window.IRCApp = IRCApp
 
+# Manages the App's templates
+class Template
+    
+    # Render a template
+    renderTemplate: (name, templateContext = {}) ->
+        
+        # Ugly way of getting around CoffeeKup's compilation-into-singular-template-function
+        templateContext.template = name
+        
+        window.template context: templateContext
+
 # Application view
 AppView = Backbone.View.extend
     
@@ -48,9 +59,6 @@ AppView = Backbone.View.extend
         
         # Channel List
         @channelList = options.channelList
-        
-        # Create template
-        @template = _.template $('#app-template').html()
         
         @channelList.bind 'change:active', () =>
             @renderChannel()
@@ -73,7 +81,7 @@ AppView = Backbone.View.extend
     render: () ->
         
         # Our dom
-        dom = $(@template())
+        dom = $(Template::renderTemplate 'app')
         
         # Include the rendered DOM in one go in our element
         @el.html dom
@@ -191,10 +199,11 @@ ChannelList = Backbone.Collection.extend
 # Single channel's view in the list of channels
 ChannelView = Backbone.View.extend
 
-    # Evet hash
+    # Event hash
     events: 
         'click':      'makeActive'
     
+    # We render this thing without a template...
     tagName: 'li'
     className: 'irc-channel'
         
@@ -223,9 +232,6 @@ ChannelListView = Backbone.View.extend
 
     # Init
     initialize: () ->
-        # Template
-        @template = _.template $('#channel-list-template').html()
-        
         # @model.bind 'add', @render
         @model.bind 'refresh', () =>
             @render()
@@ -244,7 +250,7 @@ ChannelListView = Backbone.View.extend
         li.addClass 'active'
         
     render: () ->
-        dom = $(@template())
+        dom = $(Template::renderTemplate 'channelList')
         
         list = dom.find 'ul'
         
@@ -278,13 +284,10 @@ MessageView = Backbone.View.extend
     initialize: (options) ->
         _.bindAll this, 'render'
         
-        # Create template
-        @template = _.template $('#message-template').html()
-        
     # Render through the template
     render: () ->
         # In this case we replace the entire node, since it's not in the dom anyway
-        @el = $ @template @model.toJSON()
+        @el = $ Template::renderTemplate 'message', @model.toJSON()
         
         return this
 
@@ -302,9 +305,6 @@ ChatView = Backbone.View.extend
     # Initialize
     initialize: (options) ->
         _.bindAll this, 'render', 'newMessage', 'renderMessage', 'inputKey'
-        
-        # Template for the chat list
-        @template = _.template($('#chat-template').html())
         
         # Get stuff out of the options
         @messageList = options.channel.messageList
@@ -360,7 +360,7 @@ ChatView = Backbone.View.extend
 
     # Render
     render: () ->
-        @el.html @template()
+        @el.html Template::renderTemplate 'chat'
         
         @chatList = @$ 'ul'
         
