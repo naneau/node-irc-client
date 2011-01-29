@@ -41,8 +41,11 @@
   AppView = Backbone.View.extend({
     initialize: function(options) {
       this.channelList = options.channelList;
-      return this.channelList.bind('change:active', __bind(function() {
+      this.channelList.bind('change:active', __bind(function() {
         return this.renderChannel();
+      }, this));
+      return $(window).resize(__bind(function() {
+        return this.resize();
       }, this));
     },
     renderChannel: function() {

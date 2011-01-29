@@ -61,7 +61,10 @@ AppView = Backbone.View.extend
         
         @channelList.bind 'change:active', () =>
             do @renderChannel
-    
+        
+        $(window).resize () =>
+            do @resize
+            
     # Render a channel
     renderChannel: () ->
         channel = do @channelList.getActive
