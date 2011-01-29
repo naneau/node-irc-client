@@ -56,15 +56,21 @@
       }
       return channel.chatView.render();
     },
+    resize: function() {
+      return this.right.width($(window).width() - (this.left.width() + 10));
+    },
     render: function() {
       var dom;
       dom = $(Template.prototype.renderTemplate('app'));
       this.el.html(dom);
+      this.right = dom.find('#right');
+      this.left = dom.find('#left');
       this.channelListView = new ChannelListView({
         el: dom.find('#channel-list'),
         model: this.channelList
       });
-      return this.channelListView.render();
+      this.channelListView.render();
+      return this.resize();
     }
   });
   Channel = Backbone.Model.extend({

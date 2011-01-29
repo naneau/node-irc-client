@@ -76,6 +76,10 @@ AppView = Backbone.View.extend
         # Render
         do channel.chatView.render
     
+    # Set up the size
+    resize: () ->
+        @right.width $(window).width() - (do @left.width + 10)
+        
     # Render
     render: () ->
         
@@ -85,12 +89,18 @@ AppView = Backbone.View.extend
         # Include the rendered DOM in one go in our element
         @el.html dom
         
+        @right = dom.find '#right'
+        @left = dom.find '#left'
+        
         # Channel List
         @channelListView = new ChannelListView
             el: (dom.find '#channel-list'),
             model: @channelList
         
         do @channelListView.render
+        
+        # initial resize
+        do @resize
         
 # An IRC Channel
 Channel = Backbone.Model.extend
