@@ -188,15 +188,19 @@
     events: {
       'click': 'makeActive'
     },
-    tagName: 'li',
-    className: 'irc-channel',
     initialize: function() {
-      return this.model.bind('change:active', __bind(function() {
+      this.unread = 0;
+      this.model.bind('change:active', __bind(function() {
         if (this.model.get('active')) {
+          this.hideMessageCount();
           return $(this.el).addClass('active');
         } else {
           return $(this.el).removeClass('active');
         }
+      }, this));
+      return this.model.messageList.bind('add', __bind(function() {
+        this.unread++;
+        return this.showUnread();
       }, this));
     },
     makeActive: function() {
@@ -206,8 +210,26 @@
         });
       }
     },
+    hideMessageCount: function() {
+      this.unread = 0;
+      return this.messageCountEl.hide();
+    },
+    showUnread: function() {
+      if (this.model.get('active')) {
+        return;
+      }
+      this.messageCountEl.text(this.unread);
+      return this.messageCountEl.show();
+    },
     render: function() {
-      $(this.el).text(this.model.get('name'));
+      var dom, nameEl;
+      dom = $(Template.prototype.renderTemplate('channelListChannel'));
+      this.el = dom;
+      this.delegateEvents();
+      nameEl = this.el.find('.name');
+      nameEl.text(this.model.get('name'));
+      this.messageCountEl = this.el.find('.message-count');
+      this.hideMessageCount();
       return this;
     }
   });

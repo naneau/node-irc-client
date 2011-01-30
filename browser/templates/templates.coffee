@@ -29,6 +29,15 @@ templates.channelList = () ->
     section class: 'conversations', () ->
         h2 -> 'Conversations'
         ul()
-        
+
+templates.channelListChannel = () ->
+    li class: 'irc-channel', ->
+        span class: 'name', -> @name
+        span class: 'message-count'
+            
+# We render this thing without a template...
+tagName: 'li'
+className: 'irc-channel'
+
 return templates[@template]() if templates[@template]
 

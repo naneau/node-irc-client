@@ -200,6 +200,24 @@ templates.channelList = function() {
     return ul();
   });
 };
+templates.channelListChannel = function() {
+  return li({
+    "class": 'irc-channel'
+  }, function() {
+    span({
+      "class": 'name'
+    }, function() {
+      return this.name;
+    });
+    return span({
+      "class": 'message-count'
+    });
+  });
+};
+({
+  tagName: 'li',
+  className: 'irc-channel'
+});
 if (templates[this.template]) {
   return templates[this.template]();
 }}).call(ck_options.context);return ck_buffer.join('');

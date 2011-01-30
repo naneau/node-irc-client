@@ -116,27 +116,54 @@ ChannelView = Backbone.View.extend
     events: 
         'click':      'makeActive'
     
-    # We render this thing without a template...
-    tagName: 'li'
-    className: 'irc-channel'
         
     # Initialize
     initialize: () ->
+        @unread = 0
+        
         # Track active state
         @model.bind 'change:active', () =>
             if @model.get 'active'
+                do @hideMessageCount
                 $(@el).addClass 'active'
             else 
                 $(@el).removeClass 'active'
-    
+                
+        # Track unread messages
+        @model.messageList.bind 'add', () =>
+            @unread++
+            do @showUnread
+            
     # Make our model active if it isn't already
     makeActive: () ->
         if not @model.get 'active'
             @model.set active: true
             
+    # Hide the message counter, and reset
+    hideMessageCount: () ->
+        @unread = 0
+        do @messageCountEl.hide
+    
+    # Update and show unread message count
+    showUnread: () ->
+        return if @model.get 'active'
+        
+        @messageCountEl.text @unread
+        do @messageCountEl.show
+        
     # Render
     render: () ->
-        $(@el).text @model.get 'name'
+        # Replace our element with a rendered one
+        dom = $(Template::renderTemplate 'channelListChannel')
+        @el = dom
+        do @delegateEvents
+        
+        nameEl = @el.find '.name'
+        nameEl.text @model.get 'name'
+        
+        # Find and hide the message count, we'll show once there are messages
+        @messageCountEl = @el.find '.message-count'
+        do @hideMessageCount
         
         this
 
