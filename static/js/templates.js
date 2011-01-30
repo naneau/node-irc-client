@@ -160,18 +160,21 @@ templates.app = function() {
   });
 };
 templates.chat = function() {
-  ul({
-    "class": 'chat'
+  return section({
+    "class": 'chat-wrap'
   }, function() {
-    return h2(function() {
+    h2(function() {
       return this.name;
     });
-  });
-  return form(function() {
-    return input({
-      type: 'text',
-      id: 'message',
-      autocomplete: 'off'
+    ul({
+      "class": 'chat'
+    });
+    return form(function() {
+      return input({
+        type: 'text',
+        id: 'message',
+        autocomplete: 'off'
+      });
     });
   });
 };

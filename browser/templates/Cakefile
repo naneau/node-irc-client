@@ -13,5 +13,5 @@ task 'build', ->
     
     str = String(compiled).replace 'function anonymous', 'function template'
     
-    fs.writeFile '../static/js/templates.js', str, (err) ->
+    fs.writeFile '../../static/js/templates.js', str, (err) ->
         console.log err if err

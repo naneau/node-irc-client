@@ -46,6 +46,7 @@ class IRCApp
         
         # Listen for outgoing messages
         @channelList.bind 'channelInput', (channel, message) =>
+            console.log 'received message in ' + channel.get 'name'
             @socket.send
                 message: 'channelMessage',
                 channel: (channel.get 'name'),
@@ -62,8 +63,9 @@ AppView = Backbone.View.extend
         # Channel List
         @channelList = options.channelList
         
-        @channelList.bind 'change:active', () =>
-            do @renderChannel
+        # If there's a new channel that becomes active, render that channel
+        @channelList.bind 'change:active', (model, active) =>
+            do @renderChannel if active
         
         $(window).resize () =>
             do @resize
@@ -72,19 +74,33 @@ AppView = Backbone.View.extend
     renderChannel: () ->
         channel = do @channelList.getActive
         
-        # Create the channel's chat-view if it doesn't exist already
+        # Hide all previous children in our wrapper (other channels)
+        do @channelWrapper.children().hide
+                
+        # Give the channel a view if it didn't have one already
         if not channel.chatView?
+            channel.chatView = new ChatView channel: channel
             
-            channel.chatView = new ChatView
-                el: (@$ '#channel'),
-                channel: channel
+            # Initial render
+            do channel.chatView.render
+            @channelWrapper.append channel.chatView.el
         
-        # Render
-        do channel.chatView.render
-    
+        # Show the relevant element (and only that)
+        do channel.chatView.el.show
+        
+        # Resize
+        do channel.chatView.resize
+        
+        # Do a resize here, so we're initalized with proper dimensions
+        do @resize
+        
     # Set up the size
     resize: () ->
-        @right.width $(window).width() - (do @left.width + 10)
+        @right.width $(window).width() - (do @left.width + 5)
+        @right.height $('body').innerHeight()
+        
+        @channelWrapper.height @right.height()
+        @channelWrapper.children().height @right.height()
         
     # Render
     render: () ->
@@ -95,8 +111,10 @@ AppView = Backbone.View.extend
         # Include the rendered DOM in one go in our element
         @el.html dom
         
+        # Find some elements in the dom and store them for easy retrieval later
         @right = dom.find '#right'
         @left = dom.find '#left'
+        @channelWrapper = @$ '#channel'
         
         # Channel List
         @channelListView = new ChannelListView

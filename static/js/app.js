@@ -25,6 +25,7 @@
     IRCApp.prototype.createChannelList = function() {
       this.channelList = new ChannelList;
       return this.channelList.bind('channelInput', __bind(function(channel, message) {
+        console.log('received message in ' + channel.get('name'));
         return this.socket.send({
           message: 'channelMessage',
           channel: channel.get('name'),
@@ -38,8 +39,10 @@
   AppView = Backbone.View.extend({
     initialize: function(options) {
       this.channelList = options.channelList;
-      this.channelList.bind('change:active', __bind(function() {
-        return this.renderChannel();
+      this.channelList.bind('change:active', __bind(function(model, active) {
+        if (active) {
+          return this.renderChannel();
+        }
       }, this));
       return $(window).resize(__bind(function() {
         return this.resize();
@@ -48,16 +51,23 @@
     renderChannel: function() {
       var channel;
       channel = this.channelList.getActive();
+      this.channelWrapper.children().hide();
       if (!(channel.chatView != null)) {
         channel.chatView = new ChatView({
-          el: this.$('#channel'),
           channel: channel
         });
+        channel.chatView.render();
+        this.channelWrapper.append(channel.chatView.el);
       }
-      return channel.chatView.render();
+      channel.chatView.el.show();
+      channel.chatView.resize();
+      return this.resize();
     },
     resize: function() {
-      return this.right.width($(window).width() - (this.left.width() + 10));
+      this.right.width($(window).width() - (this.left.width() + 5));
+      this.right.height($('body').innerHeight());
+      this.channelWrapper.height(this.right.height());
+      return this.channelWrapper.children().height(this.right.height());
     },
     render: function() {
       var dom;
@@ -65,6 +75,7 @@
       this.el.html(dom);
       this.right = dom.find('#right');
       this.left = dom.find('#left');
+      this.channelWrapper = this.$('#channel');
       this.channelListView = new ChannelListView({
         el: dom.find('#channel-list'),
         model: this.channelList
@@ -255,6 +266,7 @@
     },
     initialize: function(options) {
       _.bindAll(this, 'render', 'newMessage', 'renderMessage', 'inputKey');
+      this.el = $(this.el);
       this.channel = options.channel;
       this.messageList = options.channel.messageList;
       this.inputList = options.channel.inputList;
@@ -270,7 +282,7 @@
       }));
       message.view.render();
       this.chatList.append(message.view.el);
-      return this.chatList.attr('scrollTop', this.chatList.attr('scrollHeight'));
+      return this.resize();
     },
     inputKey: function(e) {
       var inputVal;
@@ -290,17 +302,24 @@
     },
     resize: function() {
       var input;
-      this.chatList.height($(window).height() - 120);
+      this.el.attr({
+        scrollTop: this.el.attr('scrollHeight')
+      });
       input = this.$('input');
       input.focus();
-      return input.width(this.chatList.width() - 15);
+      return input.width(this.el.width() - 20);
     },
     render: function() {
-      this.el.html(Template.prototype.renderTemplate('chat', this.channel.toJSON()));
+      var dom;
+      dom = Template.prototype.renderTemplate('chat', this.channel.toJSON());
+      this.el = $(dom);
+      this.delegateEvents();
       this.chatList = this.$('ul');
-      return this.messageList.each(__bind(function(message) {
+      this.messageList.each(__bind(function(message) {
         return this.renderMessage(message);
       }, this));
+      this.resize();
+      return this;
     }
   });
   Template = (function() {

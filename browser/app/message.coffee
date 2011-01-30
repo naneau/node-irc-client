@@ -35,6 +35,9 @@ ChatView = Backbone.View.extend
     initialize: (options) ->
         _.bindAll this, 'render', 'newMessage', 'renderMessage', 'inputKey'
         
+        # jQuery-fy our @el property
+        @el = $(@el)
+        
         # Get stuff out of the options
         @channel = options.channel
         @messageList = options.channel.messageList
@@ -42,7 +45,7 @@ ChatView = Backbone.View.extend
 
         # When a message is received, render it
         @messageList.bind 'add', @newMessage
-
+        
     # New message has been added to the list
     newMessage: (message) ->
         @renderMessage message
@@ -56,13 +59,15 @@ ChatView = Backbone.View.extend
         # Create a view for the message and render it
         message.view or= new MessageView model: message
         do message.view.render
-
+        
         @chatList.append message.view.el
-        @chatList.attr 'scrollTop', @chatList.attr 'scrollHeight'
+        
+        # We might need to resize
+        do @resize
 
     # Input box key-up handler
     inputKey: (e) ->
-
+        
         # Prevent default
         do e.preventDefault if e.keyCode is 13 
 
@@ -80,18 +85,30 @@ ChatView = Backbone.View.extend
 
     # Resize elements
     resize: () ->
-        @chatList.height $(window).height() - 120
-
+        
+        @el.attr scrollTop: (@el.attr 'scrollHeight')
+        
+        # Find our text input
         input = @$ 'input'
+        
+        # Focus it while we're at it
         do input.focus
-        input.width @chatList.width() - 15
+        
+        # Make it as wide as we are, minus a little padding on the right
+        input.width (@el.width() - 20)
 
     # Render
     render: () ->
-        @el.html Template::renderTemplate 'chat', do @channel.toJSON
+        dom = Template::renderTemplate 'chat', do @channel.toJSON
+        @el = $(dom)
+        do @delegateEvents
         
         @chatList = @$ 'ul'
         
         # Render each message in the list
         @messageList.each (message) =>
             @renderMessage message
+            
+        do @resize
+        
+        this

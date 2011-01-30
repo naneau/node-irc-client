@@ -8,12 +8,13 @@ ins{text-decoration:none;}
 del{text-decoration:line-through;}
 table{border-collapse:collapse;border-spacing:0;}
 html,body{width:100%;}
-body{font-family:"Helvetica Neue",Arial,Helvetica,Geneva,sans-serif;font-size:80%;}
+body{font-family:"Helvetica Neue",Arial,Helvetica,Geneva,sans-serif;font-size:80%;margin:0;padding:0;}
 .app{padding:0px;}
-#left,#right{position:absolute;overflow-y:auto;overflow-x:hidden;}
+#left,#right{position:absolute;overflow-y:hidden;overflow-x:hidden;}
 #left{background-image:url(../img/noise-stolen.png);-webkit-box-shadow:3px 0px 6px rgba(0, 0, 0, 0.4);height:100%;width:300px;border-right:1px solid #666;}
 #right{width:900px;height:100%;left:305px;}
-.wrap{padding:10px;}
+.wrap{position:relative;}
+#left .wrap{padding:10px;}
 .nav-section{margin:0 0 20px 0;}
 .nav-list{background-color:rgba(0, 0, 0, 0.2);border-radius:5px;-webkit-box-shadow:0px 0px 4px rgba(0, 0, 0, 0.4);border:1px solid #555;}
 .nav-list-item{color:#fff;font-weight:bold;margin:0 0 0px 0;padding:9px 10px;position:relative;border-top:1px solid #6e6f6f;border-bottom:1px solid #4d4e4e;text-shadow:1px 1px 1px rgba(0, 0, 0, 0.3);background-repeat:no-repeat;background-position:6px 9px;padding-left:28px;}
@@ -29,7 +30,9 @@ section.conversations ul{background-color:rgba(0, 0, 0, 0.2);border-radius:5px;-
 .irc-channel{color:#fff;font-weight:bold;margin:0 0 0px 0;padding:9px 10px;position:relative;border-top:1px solid #6e6f6f;border-bottom:1px solid #4d4e4e;text-shadow:1px 1px 1px rgba(0, 0, 0, 0.3);background-repeat:no-repeat;background-position:6px 9px;padding-left:28px;background-image:url(../img/social-icons/16px/button-green.png);}
 .irc-channel.active{background-color:rgba(255, 255, 255, 0.07);}
 .xmpp{color:#fff;font-weight:bold;margin:0 0 0px 0;padding:9px 10px;position:relative;border-top:1px solid #6e6f6f;border-bottom:1px solid #4d4e4e;text-shadow:1px 1px 1px rgba(0, 0, 0, 0.3);background-repeat:no-repeat;background-position:6px 9px;padding-left:28px;background-image:url(../img/social-icons/16px/google-talk.png);}
-ul.chat{overflow-y:auto;color:#464648;}
+.chat-wrap{overflow-y:auto;overflow-x:hidden;}
+ul.chat{color:#464648;padding:50px 10px 40px 10px;}
 .message{list-style:none;display:block;position:relative;padding:5px 0 10px 150px;margin:0 0 5px 0;list-style-type:square;list-style-position:inside;border-bottom:1px dotted #ddd;}
 .message .nick{width:130px;border-radius:2px;display:block;left:0;top:0;position:absolute;text-align:right;font-weight:bold;padding:3px 7px 5px 0px;border:1px solid #e2e8ee;background-color:#eeeff0;}
-input#message{display:block;position:absolute;bottom:5px;left:10px;width:900px;border:1px solid #ccc;border-radius:3px;height:20px;padding:5px;font-size:1.2em;}
+.chat-wrap h2{position:absolute;padding-top:10px;top:0px;left:10px;right:0px;z-index:3;background-color:#fff;border:0 !important;-webkit-box-shadow:0px 3px 3px rgba(255, 255, 255, 0.9);}
+input#message{display:block;position:absolute;bottom:10px;left:10px;border:1px solid #ccc;border-radius:3px;padding:5px 10px;font-size:1.1em;font-size:inherit;}

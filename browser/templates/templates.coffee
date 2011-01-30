@@ -10,11 +10,13 @@ templates.app = () ->
                 
 # Template for a chat
 templates.chat = () ->
-    ul class: 'chat', ->
+    section class: 'chat-wrap', () ->
         h2 -> @name
+        
+        ul class: 'chat'
     
-    form ->
-        input type: 'text', id: 'message', autocomplete: 'off'
+        form ->
+            input type: 'text', id: 'message', autocomplete: 'off'
         
 # Single message
 templates.message = () ->
