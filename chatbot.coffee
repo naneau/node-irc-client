@@ -63,8 +63,9 @@ socket.on 'connection', (client) ->
     sys.puts 'socket.io client connected'
     
     client.on 'message', (data) ->
-        if data.message?
-            ircClient.say channel, data.message.message
+        console.log data
+        if data.message is 'channelMessage'
+            ircClient.say data.channel, data.text
     
     # Send the channel list
     client.send 

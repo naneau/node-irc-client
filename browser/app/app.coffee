@@ -4,8 +4,8 @@ class IRCApp
     # Constructor, gets passed the DOM element we want to render into
     constructor: (element) ->
         
-        # List of channels
-        @channelList = new ChannelList
+        # Create channel list
+        do @createChannelList
         
         # Set up socket and message handling
         do @setupSocket
@@ -18,6 +18,7 @@ class IRCApp
         # Render App View
         do @appView.render
     
+    # Set up the Socket, and handle incoming messages
     setupSocket: () ->
         # Create socket connection
         @socket = new io.Socket;
@@ -36,7 +37,20 @@ class IRCApp
                 
         # Connect the socket
         do @socket.connect
+    
+    # Create channel list and set up handler
+    createChannelList: () ->
         
+        # List of channels
+        @channelList = new ChannelList
+        
+        # Listen for outgoing messages
+        @channelList.bind 'channelInput', (channel, message) =>
+            @socket.send
+                message: 'channelMessage',
+                channel: (channel.get 'name'),
+                text: (message.get 'message')
+            
 window.IRCApp = IRCApp
 
 # Application view

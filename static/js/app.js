@@ -3,7 +3,7 @@
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   IRCApp = (function() {
     function IRCApp(element) {
-      this.channelList = new ChannelList;
+      this.createChannelList();
       this.setupSocket();
       this.appView = new AppView({
         el: element,
@@ -21,6 +21,16 @@
         }
       }, this));
       return this.socket.connect();
+    };
+    IRCApp.prototype.createChannelList = function() {
+      this.channelList = new ChannelList;
+      return this.channelList.bind('channelInput', __bind(function(channel, message) {
+        return this.socket.send({
+          message: 'channelMessage',
+          channel: channel.get('name'),
+          text: message.get('message')
+        });
+      }, this));
     };
     return IRCApp;
   })();
@@ -69,7 +79,10 @@
         active: false
       });
       this.messageList = new MessageList;
-      return this.inputList = new MessageList;
+      this.inputList = new MessageList;
+      return this.inputList.bind('add', __bind(function(message) {
+        return this.messageList.add(message.toJSON());
+      }, this));
     },
     addMessage: function(message, from) {
       return this.messageList.add(new Message({

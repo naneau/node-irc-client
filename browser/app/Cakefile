@@ -6,21 +6,20 @@ exec  = (require 'child_process').exec
 outputDir = '../../static/js'
 outputFile = 'app.js'
 
-# Non recursive find function... :x
+# Using the power of `find` we do a quick recursive search for CoffeeCcript files
 findCoffeeScripts = (callback) ->
-    fs.readdir '.', (err, files) ->
-        foundFiles = []  
-        for file in files
-            do (file) ->
-                foundFiles.push file if file.match /\.coffee/
-        
-        callback foundFiles
+    exec 'find . -name \\*.coffee', (err, stdOut, stdIn) ->
+        files = stdOut.split '\n'
+        callback files
 
 # Quick 'n dirty compile
 compile = () ->
     exec 'coffee -o ' + outputDir + ' -j -c `find *.coffee`', (err, stdOut, stdIn) ->
         if not err?
+            # Move the temp "concatenation.js" file to outputFile
             exec 'mv ' + outputDir + '/concatenation.js ' + outputDir + '/' + outputFile, (err, stdOut, stdIn) ->
+                console.log err
+                console.log stdOut
                 console.log 'Compiled'
 
 # Single compile
@@ -38,5 +37,8 @@ task 'watch', ->
         for file in files 
             do (file) ->
                 fs.watchFile file, interval: 100, (curr, prev) ->
-                    do compile
-                
+                    currDate = new Date curr.mtime
+                    prevDate = new Date prev.mtime
+                    if currDate > prevDate
+                        console.log file + ' changed'
+                        do compile

@@ -1,4 +1,3 @@
-        
 # An IRC Channel
 Channel = Backbone.Model.extend
 
@@ -7,10 +6,15 @@ Channel = Backbone.Model.extend
         
         @set active: false
         
+        # Incoming and outgoing list of messages
         @messageList = new MessageList
-        
         @inputList = new MessageList
-    
+        
+        # Add outgoing messages to the incoming list
+        @inputList.bind 'add', (message) =>
+            # Add the outgoing message to the incoming list
+            @messageList.add do message.toJSON
+        
     # Add a message
     addMessage: (message, from) ->
         @messageList.add new Message 
@@ -42,6 +46,7 @@ ChannelList = Backbone.Collection.extend
         
         # Listen to new messages in the channel's input list
         channel.inputList.bind 'add', (message) =>
+            # Trigger event
             @trigger 'channelInput', channel, message
             
         channel
@@ -103,7 +108,7 @@ ChannelList = Backbone.Collection.extend
         
         # Make the channel active
         channel.set active:true
-        
+
 # Single channel's view in the list of channels
 ChannelView = Backbone.View.extend
 
