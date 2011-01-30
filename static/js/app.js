@@ -25,7 +25,6 @@
     IRCApp.prototype.createChannelList = function() {
       this.channelList = new ChannelList;
       return this.channelList.bind('channelInput', __bind(function(channel, message) {
-        console.log('received message in ' + channel.get('name'));
         return this.socket.send({
           message: 'channelMessage',
           channel: channel.get('name'),

@@ -52,7 +52,6 @@ app.get '/', (request, response) ->
 # Listen on port that is given (or use default)
 port = process.argv[2] 
 port ?= 8080
-console.log port
 app.listen parseInt port, 10
 
 # Socket.io config
@@ -63,7 +62,6 @@ socket.on 'connection', (client) ->
     sys.puts 'socket.io client connected'
     
     client.on 'message', (data) ->
-        console.log data
         if data.message is 'channelMessage'
             ircClient.say data.channel, data.text
     

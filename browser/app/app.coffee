@@ -46,7 +46,6 @@ class IRCApp
         
         # Listen for outgoing messages
         @channelList.bind 'channelInput', (channel, message) =>
-            console.log 'received message in ' + channel.get 'name'
             @socket.send
                 message: 'channelMessage',
                 channel: (channel.get 'name'),
