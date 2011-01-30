@@ -25,19 +25,6 @@
     return IRCApp;
   })();
   window.IRCApp = IRCApp;
-  Template = (function() {
-    function Template() {}
-    Template.prototype.renderTemplate = function(name, templateContext) {
-      if (templateContext == null) {
-        templateContext = {};
-      }
-      templateContext.template = name;
-      return window.template({
-        context: templateContext
-      });
-    };
-    return Template;
-  })();
   AppView = Backbone.View.extend({
     initialize: function(options) {
       this.channelList = options.channelList;
@@ -303,4 +290,17 @@
       }, this));
     }
   });
+  Template = (function() {
+    function Template() {}
+    Template.prototype.renderTemplate = function(name, templateContext) {
+      if (templateContext == null) {
+        templateContext = {};
+      }
+      templateContext.template = name;
+      return window.template({
+        context: templateContext
+      });
+    };
+    return Template;
+  })();
 }).call(this);

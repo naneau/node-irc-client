@@ -1,0 +1,42 @@
+# Utilities
+fs = require 'fs'
+exec  = (require 'child_process').exec
+
+# Output for the compilation
+outputDir = '../../static/js'
+outputFile = 'app.js'
+
+# Non recursive find function... :x
+findCoffeeScripts = (callback) ->
+    fs.readdir '.', (err, files) ->
+        foundFiles = []  
+        for file in files
+            do (file) ->
+                foundFiles.push file if file.match /\.coffee/
+        
+        callback foundFiles
+
+# Quick 'n dirty compile
+compile = () ->
+    exec 'coffee -o ' + outputDir + ' -j -c `find *.coffee`', (err, stdOut, stdIn) ->
+        if not err?
+            exec 'mv ' + outputDir + '/concatenation.js ' + outputDir + '/' + outputFile, (err, stdOut, stdIn) ->
+                console.log 'Compiled'
+
+# Single compile
+task 'compile', ->
+    do compile
+
+# Watch files in this dir and compile on modify
+task 'watch', ->
+
+    # Initial compile
+    do compile
+    
+    findCoffeeScripts (files) ->
+        console.log 'watching ' + files.length + ' files'
+        for file in files 
+            do (file) ->
+                fs.watchFile file, interval: 100, (curr, prev) ->
+                    do compile
+                
