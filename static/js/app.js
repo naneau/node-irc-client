@@ -318,17 +318,19 @@
         }));
       }
       if (e.keyCode === 13 || e.keyCode === 27) {
-        return $(e.target).val('');
+        $(e.target).val('');
       }
+      return $(window).resize(__bind(function() {
+        return this.resize();
+      }, this));
     },
     resize: function() {
-      var input;
+      this.title.width(this.el.innerWidth() - 40);
       this.el.attr({
         scrollTop: this.el.attr('scrollHeight')
       });
-      input = this.$('input');
-      input.focus();
-      return input.width(this.el.width() - 20);
+      this.input.width(this.el.width() - 30);
+      return this.input.focus();
     },
     render: function() {
       var dom;
@@ -336,6 +338,8 @@
       this.el = $(dom);
       this.delegateEvents();
       this.chatList = this.$('ul');
+      this.input = this.$('input');
+      this.title = this.$('h2');
       this.messageList.each(__bind(function(message) {
         return this.renderMessage(message);
       }, this));

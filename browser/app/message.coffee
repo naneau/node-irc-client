@@ -82,20 +82,23 @@ ChatView = Backbone.View.extend
 
         # Reset input box
         $(e.target).val('') if e.keyCode is 13 or e.keyCode is 27
-
+        
+        # Resize with the window
+        $(window).resize () =>
+            do @resize
+            
     # Resize elements
     resize: () ->
+        # Sneakily remove some width from our title so it doesn't fall over the scrollbar... this should be possible with CSS?
+        @title.width (@el.innerWidth() - 40)
         
+        # Scroll to bottom
         @el.attr scrollTop: (@el.attr 'scrollHeight')
         
-        # Find our text input
-        input = @$ 'input'
-        
-        # Focus it while we're at it
-        do input.focus
-        
-        # Make it as wide as we are, minus a little padding on the right
-        input.width (@el.width() - 20)
+        # Make our input as wide as we are, minus a little padding on the right
+        @input.width (@el.width() - 30)
+        # Focus our input while we're at it
+        do @input.focus
 
     # Render
     render: () ->
@@ -103,7 +106,10 @@ ChatView = Backbone.View.extend
         @el = $(dom)
         do @delegateEvents
         
+        # Cache some dom elements
         @chatList = @$ 'ul'
+        @input = @$ 'input'
+        @title = @$ 'h2'
         
         # Render each message in the list
         @messageList.each (message) =>

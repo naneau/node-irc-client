@@ -100,7 +100,7 @@ AppView = Backbone.View.extend
         
         @channelWrapper.height @right.height()
         @channelWrapper.children().height @right.height()
-        
+        # @channelWrapper.children().width @right.innerWidth()
     # Render
     render: () ->
         

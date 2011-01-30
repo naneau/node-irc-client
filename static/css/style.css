@@ -30,7 +30,7 @@ section.conversations ul{background-color:rgba(0, 0, 0, 0.2);border-radius:5px;-
 .irc-channel{color:#fff;font-weight:bold;margin:0 0 0px 0;padding:9px 10px;position:relative;border-top:1px solid #6e6f6f;border-bottom:1px solid #4d4e4e;text-shadow:1px 1px 1px rgba(0, 0, 0, 0.3);background-repeat:no-repeat;background-position:6px 9px;padding-left:28px;background-image:url(../img/social-icons/16px/button-green.png);}
 .irc-channel.active{background-color:rgba(255, 255, 255, 0.07);}
 .xmpp{color:#fff;font-weight:bold;margin:0 0 0px 0;padding:9px 10px;position:relative;border-top:1px solid #6e6f6f;border-bottom:1px solid #4d4e4e;text-shadow:1px 1px 1px rgba(0, 0, 0, 0.3);background-repeat:no-repeat;background-position:6px 9px;padding-left:28px;background-image:url(../img/social-icons/16px/google-talk.png);}
-.chat-wrap{overflow-y:auto;overflow-x:hidden;}
+.chat-wrap{overflow-y:scroll;overflow-x:hidden;}
 ul.chat{color:#464648;padding:50px 10px 40px 10px;}
 .message{list-style:none;display:block;position:relative;padding:5px 0 10px 150px;margin:0 0 5px 0;list-style-type:square;list-style-position:inside;border-bottom:1px dotted #ddd;}
 .message .nick{width:130px;border-radius:2px;display:block;left:0;top:0;position:absolute;text-align:right;font-weight:bold;padding:3px 7px 5px 0px;border:1px solid #e2e8ee;background-color:#eeeff0;}
