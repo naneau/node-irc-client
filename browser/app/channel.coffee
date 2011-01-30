@@ -131,8 +131,9 @@ ChannelView = Backbone.View.extend
                 
         # Track unread messages
         @model.messageList.bind 'add', () =>
-            @unread++
-            do @showUnread
+            if not (@model.get 'active')
+                @unread++
+                do @showUnread
             
     # Make our model active if it isn't already
     makeActive: () ->
@@ -142,6 +143,7 @@ ChannelView = Backbone.View.extend
     # Hide the message counter, and reset
     hideMessageCount: () ->
         @unread = 0
+        @messageCountEl.text @unread        
         do @messageCountEl.hide
     
     # Update and show unread message count

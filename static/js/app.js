@@ -198,8 +198,10 @@
         }
       }, this));
       return this.model.messageList.bind('add', __bind(function() {
-        this.unread++;
-        return this.showUnread();
+        if (!(this.model.get('active'))) {
+          this.unread++;
+          return this.showUnread();
+        }
       }, this));
     },
     makeActive: function() {
@@ -211,6 +213,7 @@
     },
     hideMessageCount: function() {
       this.unread = 0;
+      this.messageCountEl.text(this.unread);
       return this.messageCountEl.hide();
     },
     showUnread: function() {
