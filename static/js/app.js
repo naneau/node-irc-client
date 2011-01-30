@@ -265,7 +265,8 @@
   Message = Backbone.Model.extend({
     initialize: function() {
       return this.set({
-        read: false
+        read: false,
+        received: new Date
       });
     }
   });

@@ -1,5 +1,16 @@
 templates = {}
 
+# Time padding helper
+pad = (value) ->
+    console.log value
+    value = new String value
+    
+    value = '0' + value if value.length is 1
+    
+    console.log value
+    value
+formatTime = (date) ->
+    (pad do date.getHours) + ':' + (pad do date.getMinutes) + ':' + (pad do date.getSeconds)    
 templates.app = () ->
     section class: 'app', ->
         div id: 'left', ->
@@ -18,11 +29,17 @@ templates.chat = () ->
         form ->
             input type: 'text', id: 'message', autocomplete: 'off'
         
-# Single message
+# Single message    
 templates.message = () ->
     li class: 'message', ->
         span class: 'nick', -> @from
-        @message
+        
+        # Pretty padded timestamp    
+        span class: 'timestamp', -> 
+            formatTime @received
+            
+         @message
+        
         
 # Channel List
 templates.channelList = () ->

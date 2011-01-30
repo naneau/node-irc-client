@@ -4,7 +4,7 @@ Message = Backbone.Model.extend
 
     # Init
     initialize: () ->
-        @set read: false
+        @set read: false, received: new Date
 
 # View for a single message
 MessageView = Backbone.View.extend

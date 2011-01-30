@@ -34,5 +34,6 @@ section.conversations ul{background-color:rgba(0, 0, 0, 0.2);border-radius:5px;-
 ul.chat{color:#464648;padding:50px 10px 40px 10px;}
 .message{list-style:none;display:block;position:relative;padding:5px 0 10px 150px;margin:0 0 5px 0;list-style-type:square;list-style-position:inside;border-bottom:1px dotted #ddd;}
 .message .nick{width:130px;border-radius:2px;display:block;left:0;top:0;position:absolute;text-align:right;font-weight:bold;padding:3px 7px 5px 0px;border:1px solid #e2e8ee;background-color:#eeeff0;}
+.message .timestamp{position:absolute;right:10px;top:5px;color:#ccc;}
 .chat-wrap h2{position:absolute;padding-top:10px;top:0px;left:10px;right:0px;z-index:3;background-color:#fff;border:0 !important;-webkit-box-shadow:0px 3px 3px rgba(255, 255, 255, 0.9);}
-input#message{display:block;position:absolute;bottom:10px;left:10px;border:1px solid #ccc;border-radius:3px;padding:5px 10px;font-size:1.1em;font-size:inherit;}
+input#message{display:block;position:absolute;bottom:10px;left:10px;border:1px solid #c6c6c6;-webkit-box-shadow:0px 0px 3px rgba(0, 0, 0, 0.2);border-radius:3px;padding:5px 10px;font-size:1.1em;font-size:inherit;}
