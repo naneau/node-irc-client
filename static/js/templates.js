@@ -135,15 +135,13 @@ var __indexOf = Array.prototype.indexOf || function(item) {
     coffeescript = function(code) {
       return script(";(" + code + ")();");
     };
-    var a,div,em,form,h2,i,input,li,ol,p,s,section,span,th,time,tr,u,ul;a = function(){return ck_tag('a', arguments)};div = function(){return ck_tag('div', arguments)};em = function(){return ck_tag('em', arguments)};form = function(){return ck_tag('form', arguments)};h2 = function(){return ck_tag('h2', arguments)};i = function(){return ck_tag('i', arguments)};input = function(){return ck_tag('input', arguments)};li = function(){return ck_tag('li', arguments)};ol = function(){return ck_tag('ol', arguments)};p = function(){return ck_tag('p', arguments)};s = function(){return ck_tag('s', arguments)};section = function(){return ck_tag('section', arguments)};span = function(){return ck_tag('span', arguments)};th = function(){return ck_tag('th', arguments)};time = function(){return ck_tag('time', arguments)};tr = function(){return ck_tag('tr', arguments)};u = function(){return ck_tag('u', arguments)};ul = function(){return ck_tag('ul', arguments)};(function(){var formatTime, pad, templates;
+    var a,div,em,form,h2,i,input,li,p,s,section,span,th,time,tr,u,ul;a = function(){return ck_tag('a', arguments)};div = function(){return ck_tag('div', arguments)};em = function(){return ck_tag('em', arguments)};form = function(){return ck_tag('form', arguments)};h2 = function(){return ck_tag('h2', arguments)};i = function(){return ck_tag('i', arguments)};input = function(){return ck_tag('input', arguments)};li = function(){return ck_tag('li', arguments)};p = function(){return ck_tag('p', arguments)};s = function(){return ck_tag('s', arguments)};section = function(){return ck_tag('section', arguments)};span = function(){return ck_tag('span', arguments)};th = function(){return ck_tag('th', arguments)};time = function(){return ck_tag('time', arguments)};tr = function(){return ck_tag('tr', arguments)};u = function(){return ck_tag('u', arguments)};ul = function(){return ck_tag('ul', arguments)};(function(){var formatTime, pad, templates;
 templates = {};
 pad = function(value) {
-  console.log(value);
   value = new String(value);
   if (value.length === 1) {
     value = '0' + value;
   }
-  console.log(value);
   return value;
 };
 formatTime = function(date) {

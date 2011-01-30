@@ -2,15 +2,16 @@ templates = {}
 
 # Time padding helper
 pad = (value) ->
-    console.log value
     value = new String value
     
     value = '0' + value if value.length is 1
     
-    console.log value
     value
+    
+# Format a Date object into time string
 formatTime = (date) ->
-    (pad do date.getHours) + ':' + (pad do date.getMinutes) + ':' + (pad do date.getSeconds)    
+    (pad do date.getHours) + ':' + (pad do date.getMinutes) + ':' + (pad do date.getSeconds)
+    
 templates.app = () ->
     section class: 'app', ->
         div id: 'left', ->
