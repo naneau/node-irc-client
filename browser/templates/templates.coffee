@@ -7,7 +7,7 @@ pad = (value) ->
     value = '0' + value if value.length is 1
     
     value
-    
+
 # Format a Date object into time string
 formatTime = (date) ->
     (pad do date.getHours) + ':' + (pad do date.getMinutes) + ':' + (pad do date.getSeconds)

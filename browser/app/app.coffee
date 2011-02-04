@@ -1,9 +1,7 @@
 # Application class
 class IRCApp
-    
     # Constructor, gets passed the DOM element we want to render into
     constructor: (element) ->
-        
         # Create channel list
         do @createChannelList
         

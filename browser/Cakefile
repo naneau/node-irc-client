@@ -6,26 +6,31 @@ exec  = (require 'child_process').exec
 coffeekup = require 'coffeekup'
 
 # Output for the compilation
-appOutputDir = '../../static/js'
+appOutputDir = '../static/js'
 appOutputFile = 'app.js'
 
 # Using the power of `find` we do a quick recursive search for CoffeeCcript files
 findAppCoffeeScripts = (callback) ->
-    exec 'find . -name app/\\*.coffee', (err, stdOut, stdIn) ->
+    exec 'find ./app -name \\*.coffee', (err, stdOut, stdIn) ->
         files = stdOut.split '\n'
         callback files
 
 # Quick 'n dirty compile of the application logic
 compileApp = () ->
-    exec 'coffee -o ' + appOutputDir + ' -j -c `find app/*.coffee`', (err, stdOut, stdIn) ->
+    
+    # Coffeescript compile command, will create a "concatenation.js"
+    cmd = 'coffee -o ' + appOutputDir + ' -j -c `find ./app -name \\*.coffee`'
+    
+    exec cmd, (err, stdOut, stdIn) ->
         if not err?
             # Move the temp "concatenation.js" file to outputFile
             exec 'mv ' + appOutputDir + '/concatenation.js ' + appOutputDir + '/' + appOutputFile, (err, stdOut, stdIn) ->
-                console.log 'Compiled Browser JS'
+                console.log 'Error compiling browser app' if err?
+                console.log 'Compiled browser app' if not err?
 
 # Compile the templates
 compileTemplates = () ->
-    fs.readFile 'templates.coffee', 'utf-8', (err, data) ->
+    fs.readFile 'templates/templates.coffee', 'utf-8', (err, data) ->
         return if err?
         
         # Compiled string
@@ -36,7 +41,8 @@ compileTemplates = () ->
         
         # Write the templates into a single dir
         fs.writeFile '../../static/js/templates.js', str, (err) ->
-            console.log 'Compiled Templates' if not err?
+            console.log 'Error compiling templates' if err?
+            console.log 'Compiled templates' if not err?
 
 # Compile the entire browser environemtn
 compile = () ->
@@ -60,7 +66,7 @@ task 'watch', ->
     
             compDate = new Date stat.mtime
             if compDate > lastMTime
-                lastMTime = compDate
+                lastMTime.setTime do compDate.getTime
                 do fn
 
     # Highest last modification ime of application files
@@ -75,8 +81,9 @@ task 'watch', ->
         # Watch app
         findAppCoffeeScripts (files) ->
             for file in files
-                checkFile file, appLastMTime, () ->
-                    do compileApp
+                do (file) ->
+                    checkFile file, appLastMTime, () ->
+                        do compileApp
         
         # Watch templates
             checkFile 'templates/templates.coffee', templatesLastMTime, () ->

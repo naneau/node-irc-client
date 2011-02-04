@@ -1,3 +1,4 @@
+ERROR = 123123
 # An IRC Channel
 Channel = Backbone.Model.extend
 
@@ -177,7 +178,7 @@ ChannelListView = Backbone.View.extend
         # @model.bind 'add', @render
         @model.bind 'refresh', () =>
             do @render
-        
+
     # Change conversation
     changeConversation: (e) ->
         do e.preventDefault

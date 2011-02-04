@@ -1,5 +1,5 @@
 (function() {
-  var AppView, Channel, ChannelList, ChannelListView, ChannelView, ChatView, IRCApp, Message, MessageList, MessageView, Template;
+  var AppView, Channel, ChannelList, ChannelListView, ChannelView, ChatView, ERROR, IRCApp, Message, MessageList, MessageView, Template;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   IRCApp = (function() {
     function IRCApp(element) {
@@ -83,6 +83,7 @@
       return this.resize();
     }
   });
+  ERROR = 123123;
   Channel = Backbone.Model.extend({
     initialize: function() {
       this.set({
