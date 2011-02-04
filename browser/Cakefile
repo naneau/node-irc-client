@@ -1,0 +1,57 @@
+# Utilities
+fs = require 'fs'
+exec  = (require 'child_process').exec
+
+# Output for the compilation
+appOutputDir = '../../static/js'
+appOutputFile = 'app.js'
+
+# Using the power of `find` we do a quick recursive search for CoffeeCcript files
+findAppCoffeeScripts = (callback) ->
+    exec 'find . -name app/\\*.coffee', (err, stdOut, stdIn) ->
+        files = stdOut.split '\n'
+        callback files
+
+# Quick 'n dirty compile of the application logic
+compileApp = () ->
+    exec 'coffee -o ' + appOutputDir + ' -j -c `find app/*.coffee`', (err, stdOut, stdIn) ->
+        if not err?
+            # Move the temp "concatenation.js" file to outputFile
+            exec 'mv ' + appOutputDir + '/concatenation.js ' + appOutputDir + '/' + appOutputFile, (err, stdOut, stdIn) ->
+                console.log 'Compiled Browser JS'
+                
+# Compile the entire browser environemtn
+compile = () ->
+    do compileApp
+    
+# Single compile of everything
+task 'compile', ->
+    do compile
+
+# Watch files in this dir and compile on modify
+task 'watch', ->
+
+    # Initial compile (we always do one)
+    do compile
+
+    # Last MTime
+    lastMTime = new Date
+    
+    # Check a file's mtime and recompile if it's bigger than lastMTime
+    checkFile = (file, fn) ->
+        fs.stat file, (err, stat) ->
+            return if not stat?
+    
+            compDate = new Date stat.mtime
+            if compDate > lastMTime
+                lastMTime = compDate
+                do fn
+                
+    # Watch the files with an interval
+    interval = () ->
+        findAppCoffeeScripts (files) ->
+            for file in files
+                checkFile file, () ->
+                    do compileApp
+                            
+    setInterval interval, 250
