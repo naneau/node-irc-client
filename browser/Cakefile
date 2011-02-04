@@ -2,6 +2,9 @@
 fs = require 'fs'
 exec  = (require 'child_process').exec
 
+# CoffeeKup templating
+coffeekup = require 'coffeekup'
+
 # Output for the compilation
 appOutputDir = '../../static/js'
 appOutputFile = 'app.js'
@@ -19,10 +22,26 @@ compileApp = () ->
             # Move the temp "concatenation.js" file to outputFile
             exec 'mv ' + appOutputDir + '/concatenation.js ' + appOutputDir + '/' + appOutputFile, (err, stdOut, stdIn) ->
                 console.log 'Compiled Browser JS'
-                
+
+# Compile the templates
+compileTemplates = () ->
+    fs.readFile 'templates.coffee', 'utf-8', (err, data) ->
+        return if err?
+        
+        # Compiled string
+        compiled = coffeekup.compile data
+        
+        # CoffeeKup returns anonymous fn, replace with "template"
+        str = String(compiled).replace 'function anonymous', 'function template'
+        
+        # Write the templates into a single dir
+        fs.writeFile '../../static/js/templates.js', str, (err) ->
+            console.log 'Compiled Templates' if not err?
+
 # Compile the entire browser environemtn
 compile = () ->
     do compileApp
+    do compileTemplates
     
 # Single compile of everything
 task 'compile', ->
@@ -33,12 +52,9 @@ task 'watch', ->
 
     # Initial compile (we always do one)
     do compile
-
-    # Last MTime
-    lastMTime = new Date
     
     # Check a file's mtime and recompile if it's bigger than lastMTime
-    checkFile = (file, fn) ->
+    checkFile = (file, lastMTime, fn) ->
         fs.stat file, (err, stat) ->
             return if not stat?
     
@@ -46,12 +62,24 @@ task 'watch', ->
             if compDate > lastMTime
                 lastMTime = compDate
                 do fn
-                
+
+    # Highest last modification ime of application files
+    appLastMTime = new Date
+    
+    # Same for the templates
+    templatesLastMTime = new Date
+    
     # Watch the files with an interval
     interval = () ->
+    
+        # Watch app
         findAppCoffeeScripts (files) ->
             for file in files
-                checkFile file, () ->
+                checkFile file, appLastMTime, () ->
                     do compileApp
-                            
+        
+        # Watch templates
+            checkFile 'templates/templates.coffee', templatesLastMTime, () ->
+                do compileTemplates
+                
     setInterval interval, 250
