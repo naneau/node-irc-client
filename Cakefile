@@ -5,13 +5,9 @@ exec  = (require 'child_process').exec
 # CoffeeKup templating
 coffeekup = require 'coffeekup'
 
-# Output for the compilation
-appOutputDir = '../static/js'
-appOutputFile = 'app.js'
-
 # Using the power of `find` we do a quick recursive search for CoffeeCcript files
 findAppCoffeeScripts = (callback) ->
-    exec 'find ./app -name \\*.coffee', (err, stdOut, stdIn) ->
+    exec 'find browser/app -name \\*.coffee', (err, stdOut, stdIn) ->
         files = stdOut.split '\n'
         callback files
 
@@ -19,18 +15,18 @@ findAppCoffeeScripts = (callback) ->
 compileApp = () ->
     
     # Coffeescript compile command, will create a "concatenation.js"
-    cmd = 'coffee -o ' + appOutputDir + ' -j -c `find ./app -name \\*.coffee`'
+    cmd = 'coffee -o static/js -j -c `find browser/app -name \\*.coffee`'
     
     exec cmd, (err, stdOut, stdIn) ->
         if not err?
             # Move the temp "concatenation.js" file to outputFile
-            exec 'mv ' + appOutputDir + '/concatenation.js ' + appOutputDir + '/' + appOutputFile, (err, stdOut, stdIn) ->
+            exec 'mv static/js/concatenation.js static/js/app.js', (err, stdOut, stdIn) ->
                 console.log 'Error compiling browser app' if err?
                 console.log 'Compiled browser app' if not err?
 
 # Compile the templates
 compileTemplates = () ->
-    fs.readFile 'templates/templates.coffee', 'utf-8', (err, data) ->
+    fs.readFile 'browser/templates/templates.coffee', 'utf-8', (err, data) ->
         return if err?
         
         # Compiled string
@@ -40,7 +36,7 @@ compileTemplates = () ->
         str = String(compiled).replace 'function anonymous', 'function template'
         
         # Write the templates into a single dir
-        fs.writeFile '../../static/js/templates.js', str, (err) ->
+        fs.writeFile 'static/js/templates.js', str, (err) ->
             console.log 'Error compiling templates' if err?
             console.log 'Compiled templates' if not err?
 
@@ -52,6 +48,19 @@ compile = () ->
 # Single compile of everything
 task 'compile', ->
     do compile
+
+# Compress the js
+task 'compress', ->
+    
+    # JS to compress
+    files = ['static/js/app.js','static/js/templates.js']
+    
+    # Compress them
+    for file in files 
+        do (file) ->
+            cmd = 'uglifyjs --overwrite ' + file
+            exec cmd, (err, stdOut, stdIn) ->
+                console.log ('Compressed ' + file) if not err?
 
 # Watch files in this dir and compile on modify
 task 'watch', ->
