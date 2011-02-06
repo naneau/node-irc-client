@@ -15,9 +15,6 @@ io = require 'socket.io'
 # IRC client
 irc = require 'irc'
 
-# Bot
-Bot = require './app/InsultBot'
-
 # channel = process.argv[3] 
 # channel ?= '#naneautest'
 channels = ['#naneautest', '#naneautest2','#naneautest3']
@@ -26,11 +23,11 @@ nick = 'naneaubot';
 server = 'irc.freenode.net';
 
 # Instantiate the IRC Client
-ircClient = new irc.Client server, nick, channels: channels
+# ircClient = new irc.Client server, nick, channels: channels
 
 # Quick 'n dirty error handler
-ircClient.addListener 'error', (error) ->
-    console.log error
+# ircClient.addListener 'error', (error) ->
+    # console.log error
 
 # # Create the insulting bot
 # bot = new Bot ircClient, nick
@@ -79,7 +76,7 @@ sendMessage = (from, to, message) ->
         text: message
 
 # Broadcast messages received from IRC
-ircClient.addListener 'message', sendMessage
+# ircClient.addListener 'message', sendMessage
 
 # manage a backlog
 backlogs = {}

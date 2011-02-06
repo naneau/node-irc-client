@@ -18,6 +18,7 @@ compileApp = () ->
     cmd = 'coffee -o static/js -j -c `find browser/app -name \\*.coffee`'
     
     exec cmd, (err, stdOut, stdIn) ->
+        console.log err if err
         if not err?
             # Move the temp "concatenation.js" file to outputFile
             exec 'mv static/js/concatenation.js static/js/app.js', (err, stdOut, stdIn) ->
