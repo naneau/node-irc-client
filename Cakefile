@@ -22,7 +22,7 @@ compileApp = () ->
         if not err?
             # Move the temp "concatenation.js" file to outputFile
             exec 'mv static/js/concatenation.js static/js/app.js', (err, stdOut, stdIn) ->
-                console.log 'Error compiling browser app' if err?
+                console.log ('Error compiling browser app: '  + err) if err?
                 console.log 'Compiled browser app' if not err?
 
 # Compile the templates

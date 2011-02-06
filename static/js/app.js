@@ -211,66 +211,13 @@
       this.right = dom.find('#right');
       this.left = dom.find('#left');
       this.channelWrapper = this.$('#channel');
-      ChannelListView = use('views.menu.Channels');
+      ChannelListView = use('views.menu.channels.List');
       this.channelListView = new ChannelListView({
         el: dom.find('#channel-list'),
         model: this.channelList
       });
       this.channelListView.render();
       return this.resize();
-    }
-  });
-  namespace('views');
-  views.Channel = Backbone.View.extend({
-    events: {
-      'click': 'makeActive'
-    },
-    initialize: function() {
-      this.unread = 0;
-      this.model.bind('change:active', __bind(function() {
-        if (this.model.get('active')) {
-          this.hideMessageCount();
-          return $(this.el).addClass('active');
-        } else {
-          return $(this.el).removeClass('active');
-        }
-      }, this));
-      return this.model.messageList.bind('add', __bind(function() {
-        if (!(this.model.get('active'))) {
-          this.unread++;
-          return this.showUnread();
-        }
-      }, this));
-    },
-    makeActive: function() {
-      if (!this.model.get('active')) {
-        return this.model.set({
-          active: true
-        });
-      }
-    },
-    hideMessageCount: function() {
-      this.unread = 0;
-      this.messageCountEl.text(this.unread);
-      return this.messageCountEl.hide();
-    },
-    showUnread: function() {
-      if (this.model.get('active')) {
-        return;
-      }
-      this.messageCountEl.text(this.unread);
-      return this.messageCountEl.show();
-    },
-    render: function() {
-      var dom, nameEl;
-      dom = $(Template.prototype.renderTemplate('channelListChannel'));
-      this.el = dom;
-      this.delegateEvents();
-      nameEl = this.el.find('.name');
-      nameEl.text(this.model.get('name'));
-      this.messageCountEl = this.el.find('.message-count');
-      this.hideMessageCount();
-      return this;
     }
   });
   namespace('views.chat');
@@ -353,8 +300,8 @@
       return this;
     }
   });
-  namespace('views.menu');
-  views.menu.Channels = Backbone.View.extend({
+  namespace('views.menu.channels');
+  views.menu.channels.List = Backbone.View.extend({
     initialize: function() {
       return this.model.bind('refresh', __bind(function() {
         return this.render();
@@ -375,7 +322,7 @@
       this.model.each(function(channel) {
         var ChannelView;
         if (!(channel.view != null)) {
-          ChannelView = use('views.Channel');
+          ChannelView = use('views.menu.Channel');
           channel.view = new ChannelView({
             model: channel
           });
@@ -384,6 +331,59 @@
         return list.append(channel.view.el);
       });
       return this.el.html(dom);
+    }
+  });
+  namespace('views.menu');
+  views.menu.Channel = Backbone.View.extend({
+    events: {
+      'click': 'makeActive'
+    },
+    initialize: function() {
+      this.unread = 0;
+      this.model.bind('change:active', __bind(function() {
+        if (this.model.get('active')) {
+          this.hideMessageCount();
+          return $(this.el).addClass('active');
+        } else {
+          return $(this.el).removeClass('active');
+        }
+      }, this));
+      return this.model.messageList.bind('add', __bind(function() {
+        if (!(this.model.get('active'))) {
+          this.unread++;
+          return this.showUnread();
+        }
+      }, this));
+    },
+    makeActive: function() {
+      if (!this.model.get('active')) {
+        return this.model.set({
+          active: true
+        });
+      }
+    },
+    hideMessageCount: function() {
+      this.unread = 0;
+      this.messageCountEl.text(this.unread);
+      return this.messageCountEl.hide();
+    },
+    showUnread: function() {
+      if (this.model.get('active')) {
+        return;
+      }
+      this.messageCountEl.text(this.unread);
+      return this.messageCountEl.show();
+    },
+    render: function() {
+      var dom, nameEl;
+      dom = $(Template.prototype.renderTemplate('channelListChannel'));
+      this.el = dom;
+      this.delegateEvents();
+      nameEl = this.el.find('.name');
+      nameEl.text(this.model.get('name'));
+      this.messageCountEl = this.el.find('.message-count');
+      this.hideMessageCount();
+      return this;
     }
   });
 }).call(this);
