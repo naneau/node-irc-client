@@ -53,6 +53,7 @@ views.Chat = Backbone.View.extend
         if e.keyCode is 13 and inputVal.length > 0
 
             # Create new message
+            Message = use 'models.Message'
             @inputList.add new Message 
                 message: inputVal, 
                 from: 'you'

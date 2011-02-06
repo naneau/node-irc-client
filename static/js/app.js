@@ -1,5 +1,5 @@
 (function() {
-  var Channel, ChannelList, ChannelListView, ChannelView, ChatView, IRCApp, Message, MessageList, MessageView, Template, namespace, use;
+  var Channel, ChannelList, ChannelListView, ChannelView, IRCApp, Template;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   IRCApp = (function() {
     function IRCApp(element) {
@@ -39,9 +39,11 @@
   window.IRCApp = IRCApp;
   Channel = Backbone.Model.extend({
     initialize: function() {
+      var MessageList;
       this.set({
         active: false
       });
+      MessageList = use('models.message.List');
       this.messageList = new MessageList;
       this.inputList = new MessageList;
       return this.inputList.bind('add', __bind(function(message) {
@@ -49,6 +51,8 @@
       }, this));
     },
     addMessage: function(message, from) {
+      var Message;
+      Message = use('models.Message');
       return this.messageList.add(new Message({
         message: message,
         from: from
@@ -219,7 +223,10 @@
       return this.el.html(dom);
     }
   });
-  Message = Backbone.Model.extend({
+  namespace('models.message');
+  models.message.List = Backbone.Collection.extend({});
+  namespace('models');
+  models.Message = Backbone.Model.extend({
     initialize: function() {
       return this.set({
         read: false,
@@ -227,7 +234,71 @@
       });
     }
   });
-  MessageView = Backbone.View.extend({
+  Template = (function() {
+    function Template() {}
+    Template.prototype.renderTemplate = function(name, templateContext) {
+      if (templateContext == null) {
+        templateContext = {};
+      }
+      templateContext.template = name;
+      return window.template({
+        context: templateContext
+      });
+    };
+    return Template;
+  })();
+  namespace('views');
+  views.App = Backbone.View.extend({
+    initialize: function(options) {
+      this.channelList = options.channelList;
+      this.channelList.bind('change:active', __bind(function(model, active) {
+        if (active) {
+          return this.renderChannel();
+        }
+      }, this));
+      return $(window).resize(__bind(function() {
+        return this.resize();
+      }, this));
+    },
+    renderChannel: function() {
+      var ChatView, channel;
+      channel = this.channelList.getActive();
+      this.channelWrapper.children().hide();
+      if (!(channel.chatView != null)) {
+        ChatView = use('views.Chat');
+        channel.chatView = new ChatView({
+          channel: channel
+        });
+        channel.chatView.render();
+        this.channelWrapper.append(channel.chatView.el);
+      }
+      channel.chatView.el.show();
+      channel.chatView.resize();
+      return this.resize();
+    },
+    resize: function() {
+      this.right.width($(window).width() - (this.left.width() + 5));
+      this.right.height($('body').innerHeight());
+      this.channelWrapper.height(this.right.height());
+      return this.channelWrapper.children().height(this.right.height());
+    },
+    render: function() {
+      var dom;
+      dom = $(Template.prototype.renderTemplate('app'));
+      this.el.html(dom);
+      this.right = dom.find('#right');
+      this.left = dom.find('#left');
+      this.channelWrapper = this.$('#channel');
+      this.channelListView = new ChannelListView({
+        el: dom.find('#channel-list'),
+        model: this.channelList
+      });
+      this.channelListView.render();
+      return this.resize();
+    }
+  });
+  namespace('views.chat');
+  views.chat.Message = Backbone.View.extend({
     initialize: function(options) {
       return _.bindAll(this, 'render');
     },
@@ -236,10 +307,8 @@
       return this;
     }
   });
-  MessageList = Backbone.Collection.extend({
-    model: Message
-  });
-  ChatView = Backbone.View.extend({
+  namespace('views');
+  views.Chat = Backbone.View.extend({
     events: {
       'keydown     input': 'inputKey'
     },
@@ -255,7 +324,9 @@
       return this.renderMessage(message);
     },
     renderMessage: function(message) {
+      var MessageView;
       this.chatList || (this.chatList = this.$('.chat'));
+      MessageView = use('views.chat.Message');
       message.view || (message.view = new MessageView({
         model: message
       }));
@@ -264,12 +335,13 @@
       return this.resize();
     },
     inputKey: function(e) {
-      var inputVal;
+      var Message, inputVal;
       if (e.keyCode === 13) {
         e.preventDefault();
       }
       inputVal = $(e.target).val();
       if (e.keyCode === 13 && inputVal.length > 0) {
+        Message = use('models.Message');
         this.inputList.add(new Message({
           message: inputVal,
           from: 'you'
@@ -303,115 +375,6 @@
       }, this));
       this.resize();
       return this;
-    }
-  });
-  namespace = function(ns) {
-    var parent, part, parts, _i, _len, _results;
-    parts = ns.split('.');
-    parent = null;
-    _results = [];
-    for (_i = 0, _len = parts.length; _i < _len; _i++) {
-      part = parts[_i];
-      _results.push((function(part) {
-        if (!(parent != null)) {
-          if (!(window[part] != null)) {
-            window[part] = {};
-          }
-          return parent = window[part];
-        } else {
-          if (!(parent[part] != null)) {
-            parent[part] = {};
-          }
-          return parent = parent[part];
-        }
-      })(part));
-    }
-    return _results;
-  };
-  use = function(className) {
-    var exportName, part, parts, root, _fn, _i, _len;
-    parts = className.split('.');
-    exportName = parts.pop();
-    root = null;
-    _fn = function(part) {
-      if (!(root != null)) {
-        root = window[part];
-      } else {
-        root = root[part];
-      }
-      if (!(root != null)) {
-        throw "" + className + "'s namespace not found";
-      }
-    };
-    for (_i = 0, _len = parts.length; _i < _len; _i++) {
-      part = parts[_i];
-      _fn(part);
-    }
-    if (!(root[exportName] != null)) {
-      throw "" + className + " not found";
-    }
-    return root[exportName];
-  };
-  Template = (function() {
-    function Template() {}
-    Template.prototype.renderTemplate = function(name, templateContext) {
-      if (templateContext == null) {
-        templateContext = {};
-      }
-      templateContext.template = name;
-      return window.template({
-        context: templateContext
-      });
-    };
-    return Template;
-  })();
-  namespace('views');
-  views.App = Backbone.View.extend({
-    initialize: function(options) {
-      this.channelList = options.channelList;
-      this.channelList.bind('change:active', __bind(function(model, active) {
-        if (active) {
-          return this.renderChannel();
-        }
-      }, this));
-      return $(window).resize(__bind(function() {
-        return this.resize();
-      }, this));
-    },
-    renderChannel: function() {
-      var channel;
-      channel = this.channelList.getActive();
-      this.channelWrapper.children().hide();
-      if (!(channel.chatView != null)) {
-        channel.chatView = new ChatView({
-          channel: channel
-        });
-        channel.chatView.render();
-        this.channelWrapper.append(channel.chatView.el);
-      }
-      channel.chatView.el.show();
-      channel.chatView.resize();
-      return this.resize();
-    },
-    resize: function() {
-      this.right.width($(window).width() - (this.left.width() + 5));
-      this.right.height($('body').innerHeight());
-      this.channelWrapper.height(this.right.height());
-      return this.channelWrapper.children().height(this.right.height());
-    },
-    render: function() {
-      var dom;
-      dom = $(Template.prototype.renderTemplate('app'));
-      this.el.html(dom);
-      this.right = dom.find('#right');
-      this.left = dom.find('#left');
-      this.channelWrapper = this.$('#channel');
-      this.channelListView = new ChannelListView({
-        el: dom.find('#channel-list'),
-        model: this.channelList
-      });
-      this.channelListView.render();
-      return this.resize();
     }
   });
 }).call(this);
