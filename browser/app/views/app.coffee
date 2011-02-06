@@ -25,6 +25,7 @@ views.App = Backbone.View.extend
                 
         # Give the channel a view if it didn't have one already
         if not channel.chatView?
+            ChatView = use 'views.Chat'
             channel.chatView = new ChatView channel: channel
             
             # Initial render
