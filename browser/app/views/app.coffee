@@ -64,6 +64,7 @@ views.App = Backbone.View.extend
         @channelWrapper = @$ '#channel'
         
         # Channel List
+        ChannelListView = use 'views.menu.Channels'
         @channelListView = new ChannelListView
             el: (dom.find '#channel-list'),
             model: @channelList
